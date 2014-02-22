@@ -21,6 +21,13 @@ include_directories("${CMAKE_SOURCE_DIR}/include")
 add_subdirectory(lib)
 add_subdirectory(bin)
 
+configure_file("${CMAKE_SOURCE_DIR}/libmm0.pc.in" "${CMAKE_BINARY_DIR}/libmm0.pc" @ONLY)
+install(
+  FILES "${CMAKE_BINARY_DIR}/libmm0.pc"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/pkgconfig"
+)
+
+
 install(
   DIRECTORY "${CMAKE_SOURCE_DIR}/include/mm"
   DESTINATION include
