@@ -11,7 +11,7 @@ MapMaker is a flexible [heightmap](http://en.wikipedia.org/wiki/Heightmap) gener
 
 You can see [examples](https://github.com/jube/mapmaker/tree/master/examples) such as this one (Perlin noise):
 
-![Perlin noise](https://github.com/jube/mapmaker/blob/master/examples/perlin_simple.png)
+![Perlin noise](https://raw.github.com/jube/mapmaker/master/examples/perlin_simple.png)
 
 ## Requirements
 
