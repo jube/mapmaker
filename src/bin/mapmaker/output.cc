@@ -72,21 +72,6 @@ namespace mm {
     }
   }
 
-  static void output_color_ramp(std::ostream& o, const mm::color_ramp& ramp) {
-    const std::size_t width = 512;
-    const std::size_t height = 32;
-    mm::heightmap map(width, height);
-
-    for (std::size_t x = 0; x < map.width(); ++x) {
-      double value = static_cast<double>(x) / width;
-      for (std::size_t y = 0; y < map.height(); ++y) {
-        map(x, y) = value;
-      }
-    }
-
-    output_ppm(o, map, ramp);
-  }
-
   void output_heightmap(const heightmap& map, YAML::Node node) {
     auto filename_node = node["filename"];
     if (!filename_node) {

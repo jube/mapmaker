@@ -34,6 +34,28 @@
 
 namespace mm {
 
+  namespace {
+
+    class ramp {
+    public:
+      typedef typename position::size_type size_type;
+
+      heightmap operator()(random_engine& r, size_type width, size_type height) const {
+        heightmap map(width, height);
+
+        for (size_type x = 0; x < map.width(); ++x) {
+          double value = static_cast<double>(x) / width;
+          for (size_type y = 0; y < map.height(); ++y) {
+            map(x, y) = value;
+          }
+        }
+
+        return std::move(map);
+      }
+    };
+
+  }
+
   /*
    * Noise
    */
@@ -229,6 +251,11 @@ namespace mm {
     double value = values_node.as<double>();
     return diamond_square(value);
   }
+
+  static generator_function get_ramp_generator(random_engine& engine, YAML::Node node) {
+    return ramp();
+  }
+
   /*
    * API
    */
@@ -250,6 +277,10 @@ namespace mm {
 
     if (name == "diamond-square") {
       return get_diamond_square_generator(engine, parameters_node);
+    }
+
+    if (name == "ramp") {
+      return get_ramp_generator(engine, parameters_node);
     }
 
     return null_generator;
