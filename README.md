@@ -9,6 +9,10 @@ MapMaker is a flexible [heightmap](http://en.wikipedia.org/wiki/Heightmap) gener
 * [diamond-square](http://en.wikipedia.org/wiki/Diamond-square_algorithm)
 * many erosion algorithms (thermal, hydraulic, fast)
 
+You can see [examples](https://github.com/jube/mapmaker/tree/master/examples) such as this one (Perlin noise):
+
+![Perlin noise](https://github.com/jube/mapmaker/blob/master/examples/perlin_simple.png)
+
 ## Requirements
 
 MapMaker is written in C++11 so you need a C++11 compiler like [Clang](http://clang.llvm.org/) or [GCC](http://gcc.gnu.org/). The `libmm0` library has no other dependency, the `mapmaker` binary depends on [yaml-cpp](https://code.google.com/p/yaml-cpp/).
