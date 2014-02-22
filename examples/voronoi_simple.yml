@@ -1,0 +1,18 @@
+seed: 624770640
+generator:
+  name: 'fractal'
+  parameters:
+    noise: 'cell'
+    noise_parameters:
+      count: 32
+      distance: 'euclidean'
+      coeffs: [-1, 1]
+    octaves: 1
+    lacunarity: 2.0
+    persistence: 0.5
+  size:
+    width: 513
+    height: 513
+  output:
+    type: 'grayscale'
+    filename: 'voronoi_simple.pnm'

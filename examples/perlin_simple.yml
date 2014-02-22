@@ -1,0 +1,16 @@
+seed: 2067574420
+generator:
+  name: 'fractal'
+  parameters:
+    noise: 'gradient'
+    noise_parameters:
+      curve: 'cubic'
+    octaves: 10
+    lacunarity: 2.0
+    persistence: 0.5
+  size:
+    width: 513
+    height: 513
+  output:
+    type: 'colored'
+    filename: 'perlin_simple.pnm'

@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib@LIB_SUFFIX@
+includedir=${prefix}/include
+
+Name: libmm0
+Description: a flexible heightmap generator
+URL: https://github.com/jube/libmapmaker
+Version: @CPACK_PACKAGE_VERSION@
+Libs: -L${libdir} -lmm0
+Cflags: -I${includedir}

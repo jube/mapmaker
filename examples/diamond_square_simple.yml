@@ -1,0 +1,12 @@
+seed: 3023447173
+generator:
+  name: 'diamond-square'
+  parameters:
+    values: 0
+  size:
+    width: 513
+    height: 513
+  output:
+    type: 'colored'
+    filename: 'diamond_square_simple.pnm'
+
