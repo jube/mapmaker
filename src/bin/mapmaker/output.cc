@@ -106,6 +106,7 @@ namespace mm {
     std::ofstream file(filename);
 
     if (type == "colored") {
+      // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
       mm::color_ramp ramp;
       ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
       ramp.add_color_stop(0.250, {  9,  62,  92}); // dark blue: water
