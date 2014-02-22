@@ -1,7 +1,13 @@
-# MapMaker, a flexible heightmap generator
+# MapMaker
 
-MapMaker is a flexible [heightmap](http://en.wikipedia.org/wiki/Heightmap) generator that uses a wide range of well-known techniques.
+MapMaker is a flexible [heightmap](http://en.wikipedia.org/wiki/Heightmap) generator that uses a wide range of well-known techniques:
 
+* [value noise](http://en.wikipedia.org/wiki/Value_noise)
+* [gradient noise](http://en.wikipedia.org/wiki/Gradient_noise), also known as [Perlin noise](http://en.wikipedia.org/wiki/Perlin_noise)
+* [simplex noise](http://en.wikipedia.org/wiki/Simplex_noise)
+* cell noise, also known as [Worley noise](http://en.wikipedia.org/wiki/Worley_noise)
+* [diamond-square](http://en.wikipedia.org/wiki/Diamond-square_algorithm)
+* many erosion algorithms (thermal, hydraulic, fast)
 
 ## Requirements
 
