@@ -13,6 +13,7 @@ set(LIBMM_SRC
   hydraulic_erosion.cc
   islandize.cc
   logical_combine.cc
+  midpoint_displacement.cc
   normalize.cc
   ratio.cc
   reachability.cc

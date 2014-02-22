@@ -21,6 +21,34 @@ Parameters:
   * `type`: the type of output, one of: `colored`, `grayscale`
   * `filename`: the name of the file (with a `.pnm` extension)
 
+### `midpoint-displacement`
+
+Parameters:
+
+* `values`: initial values at the corner. Can be a number or an array of 4 numbers.
+
+Examples:
+
+```yml
+generator:
+  name: 'midpoint-displacement'
+  parameters:
+    values: 0
+  size:
+    width: 100
+    height: 100
+```
+
+```yml
+generator:
+  name: 'midpoint-displacement'
+  parameters:
+    values: [0, 100, 200, 300]
+  size:
+    width: 200
+    height: 200
+```
+
 ### `diamond-square`
 
 Parameters:

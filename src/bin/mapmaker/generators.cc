@@ -24,6 +24,7 @@
 #include <mm/distance.h>
 #include <mm/fractal.h>
 #include <mm/gradient_noise.h>
+#include <mm/midpoint_displacement.h>
 #include <mm/normalize.h>
 #include <mm/simplex_noise.h>
 #include <mm/value_noise.h>
@@ -252,6 +253,32 @@ namespace mm {
     return diamond_square(value);
   }
 
+  static generator_function get_midpoint_displacement_generator(random_engine& engine, YAML::Node node) {
+    auto values_node = node["values"];
+    if (!values_node) {
+      throw bad_structure("mapmaker: missing 'values' in 'diamond-square' generator parameters");
+    }
+
+    if (values_node.IsSequence()) {
+      if (values_node.size() != 4) {
+        throw bad_structure("mapmaker: wrong array size in 'values' in 'diamond-square' generator parameters");
+      }
+
+      std::array<double, 4> values;
+      for (std::size_t i = 0; i < values_node.size(); ++i) {
+        values.at(i) = values_node[i].as<double>(); // TODO: verify that it is a scalar
+      }
+
+      return midpoint_displacement(values[0], values[1], values[2], values[3]);
+    }
+
+    assert(values_node.IsScalar());
+
+    double value = values_node.as<double>();
+    return midpoint_displacement(value);
+  }
+
+
   static generator_function get_ramp_generator(random_engine& engine, YAML::Node node) {
     return ramp();
   }
@@ -277,6 +304,10 @@ namespace mm {
 
     if (name == "diamond-square") {
       return get_diamond_square_generator(engine, parameters_node);
+    }
+
+    if (name == "midpoint-displacement") {
+      return get_midpoint_displacement_generator(engine, parameters_node);
     }
 
     if (name == "ramp") {
