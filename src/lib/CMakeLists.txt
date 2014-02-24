@@ -10,6 +10,7 @@ set(LIBMM_SRC
   fractal.cc
   gradient_noise.cc
   heightmap.cc
+  hills.cc
   hydraulic_erosion.cc
   islandize.cc
   logical_combine.cc

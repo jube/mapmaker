@@ -24,6 +24,7 @@
 #include <mm/distance.h>
 #include <mm/fractal.h>
 #include <mm/gradient_noise.h>
+#include <mm/hills.h>
 #include <mm/midpoint_displacement.h>
 #include <mm/normalize.h>
 #include <mm/simplex_noise.h>
@@ -282,6 +283,28 @@ namespace mm {
   }
 
 
+  static generator_function get_hills_generator(random_engine& engine, YAML::Node node) {
+    auto count_node = node["count"];
+    if (!count_node) {
+      throw bad_structure("mapmaker: missing 'count' in 'hills' generator parameters");
+    }
+    auto count = count_node.as<hills::size_type>();
+
+    auto radius_min_node = node["radius_min"];
+    if (!radius_min_node) {
+      throw bad_structure("mapmaker: missing 'radius_min' in 'hills' generator parameters");
+    }
+    auto radius_min = radius_min_node.as<double>();
+
+    auto radius_max_node = node["radius_max"];
+    if (!radius_max_node) {
+      throw bad_structure("mapmaker: missing 'radius_max' in 'hills' generator parameters");
+    }
+    auto radius_max = radius_max_node.as<double>();
+
+    return hills(count, radius_min, radius_max);
+  }
+
   static generator_function get_ramp_generator(random_engine& engine, YAML::Node node) {
     return ramp();
   }
@@ -311,6 +334,10 @@ namespace mm {
 
     if (name == "midpoint-displacement") {
       return get_midpoint_displacement_generator(engine, parameters_node);
+    }
+
+    if (name == "hills") {
+      return get_hills_generator(engine, parameters_node);
     }
 
     if (name == "ramp") {

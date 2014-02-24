@@ -182,6 +182,28 @@ generator:
     height: 200
 ```
 
+### `hills`
+
+Parameters:
+
+* `count`: the number of hills to generate (typically `100`)
+* `radius_min`: the minimum radius of the hills, in fraction of the size of the map
+* `radius_max`: the maximum radius of the hills, in fraction of the size of the map
+
+Example:
+
+```yml
+generator:
+  name: 'hills'
+  parameters:
+    count: 100
+    radius_min: 0.3
+    radius_max: 0.6
+  size:
+    width: 100
+    height: 100
+```
+
 ## Modifiers
 
 Parameters:
