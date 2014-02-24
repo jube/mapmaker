@@ -42,7 +42,7 @@ Parameters:
 * `size`: the size of the map (in pixels)
   * `width`: the width of the map (in pixels)
   * `height`: the height of the map (in pixels)
-* `output`: see [Ouput](#Output)
+* `output`: see [Ouput](#output)
 
 ### `midpoint-displacement`
 
@@ -233,7 +233,7 @@ Parameters:
 
 * `name`: the name of the modifier
 * `parameters`: the parameters of the modifier (see below)
-* `output`: see [Ouput](#Output)
+* `output`: see [Ouput](#output)
 
 ### `thermal-erosion`
 
