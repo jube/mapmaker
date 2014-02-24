@@ -29,8 +29,9 @@ namespace mm {
   public:
     typedef std::size_t size_type;
 
-    fractal(std::function<double(double,double)> noise, size_type octaves = 8, double lacunarity = 2.0, double persistence = 0.5)
+    fractal(std::function<double(double,double)> noise, double scale, size_type octaves = 8, double lacunarity = 2.0, double persistence = 0.5)
     : m_noise(noise)
+    , m_scale(scale)
     , m_octaves(octaves)
     , m_lacunarity(lacunarity)
     , m_persistence(persistence)
@@ -41,6 +42,7 @@ namespace mm {
 
   private:
     std::function<double(double,double)> m_noise;
+    double m_scale;
     size_type m_octaves;
     double m_lacunarity;
     double m_persistence;

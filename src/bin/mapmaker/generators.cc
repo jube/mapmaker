@@ -206,6 +206,9 @@ namespace mm {
       noise = null_noise;
     }
 
+    auto scale_node = node["scale"];
+    double scale = (!scale_node) ? 1.0 : scale_node.as<double>();
+
     auto octaves_node = node["octaves"];
     if (!octaves_node) {
       throw bad_structure("mapmaker: missing 'octaves' in 'fractal' generator parameters");
@@ -224,7 +227,7 @@ namespace mm {
     }
     auto persistence = persistence_node.as<double>();
 
-    return fractal(noise, octaves, lacunarity, persistence);
+    return fractal(noise, scale, octaves, lacunarity, persistence);
   }
 
 
