@@ -16,10 +16,6 @@
 #ifndef MM_FRACTAL_H
 #define MM_FRACTAL_H
 
-#include <iostream>
-#include <cassert>
-#include <cmath>
-
 #include <mm/heightmap.h>
 #include <mm/random.h>
 
