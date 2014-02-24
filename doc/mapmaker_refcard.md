@@ -28,9 +28,11 @@ Parameters:
 Example:
 
 ```yml
-  output: 'colored'
-  parameters:
-    sea_level: 0.5
+  output:
+    type: 'colored'
+    parameters:
+      sea_level: 0.5
+    filename: 'map.pnm'
 ```
 
 ## Generators
