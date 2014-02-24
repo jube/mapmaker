@@ -44,8 +44,9 @@ namespace mm {
 
     class playability {
     public:
-      playability(reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus)
-      : m_unit_size(unit_size)
+      playability(double sea_level, reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus)
+      : m_sea_level(sea_level)
+      , m_unit_size(unit_size)
       , m_building_size(building_size)
       , m_unit_talus(unit_talus)
       , m_building_talus(building_talus)
@@ -58,7 +59,7 @@ namespace mm {
         print_indent();
         std::printf("\terosion score: " BEGIN_VALUE "%f" END_VALUE "\n", erosion);
 
-        auto island_map = cutoff(0.5)(map);
+        auto island_map = cutoff(m_sea_level)(map);
 
         auto slope_map = slope()(map);
 
@@ -90,6 +91,7 @@ namespace mm {
       }
 
     private:
+      double m_sea_level;
       reachability::size_type m_unit_size;
       reachability::size_type m_building_size;
       double m_unit_talus;
@@ -110,6 +112,12 @@ namespace mm {
   }
 
   static finalizer_function get_playability_finalizer(YAML::Node node, heightmap::size_type size) {
+    auto sea_level_node = node["sea_level"];
+    if (!sea_level_node) {
+      throw bad_structure("mapmaker: missing 'sea_level' in 'playability' finalizer parameters");
+    }
+    auto sea_level = sea_level_node.as<double>();
+
     auto nu_node = node["unit_size"];
     if (!nu_node) {
       throw bad_structure("mapmaker: missing 'unit_size' in 'playability' finalizer parameters");
@@ -134,7 +142,7 @@ namespace mm {
     }
     auto tb = tb_node.as<double>();
 
-    return playability(nu, nb, tu / size, tb / size);
+    return playability(sea_level, nu, nb, tu / size, tb / size);
   }
 
   /*

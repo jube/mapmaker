@@ -55,14 +55,22 @@ namespace mm {
     }
   }
 
-  static void output_ppm(std::ostream& o, const mm::heightmap& map, const mm::color_ramp& ramp) {
+  static void output_ppm(std::ostream& o, const mm::heightmap& map, const mm::color_ramp& ramp, const double sea_level) {
     o << "P3\n";
     o << map.width() << ' ' << map.height() << '\n';
     o << static_cast<unsigned>(mm::color::max) << '\n';
 
     for (std::size_t y = 0; y < map.height(); ++y) {
       for (std::size_t x = 0; x < map.width(); ++x) {
-        auto color = ramp.get_color(map(x, y));
+        auto value = map(x, y);
+
+        if (value < sea_level) {
+          value = value / sea_level * 0.5;
+        } else {
+          value = (value - sea_level) / (1.0 - sea_level) * 0.5 + 0.5;
+        }
+
+        auto color = ramp.get_color(value);
         o << static_cast<unsigned>(color.red_channel()) << ' '
             << static_cast<unsigned>(color.green_channel()) << ' '
             << static_cast<unsigned>(color.blue_channel()) << ' ';
@@ -91,6 +99,17 @@ namespace mm {
     std::ofstream file(filename);
 
     if (type == "colored") {
+      auto parameters_node = node["parameters"];
+      if (!parameters_node) {
+        throw bad_structure("mapmaker: missing 'parameters' in 'colored' output definition");
+      }
+
+      auto sea_level_node = parameters_node["sea_level"];
+      if (!sea_level_node) {
+        throw bad_structure("mapmaker: missing 'sea_level' in 'colored' output parameters");
+      }
+      auto sea_level = sea_level_node.as<double>();
+
       // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
       mm::color_ramp ramp;
       ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
@@ -103,7 +122,7 @@ namespace mm {
       ramp.add_color_stop(0.950, {179, 179, 179}); // grey: rocks
       ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
 
-      output_ppm(file, map, ramp);
+      output_ppm(file, map, ramp, sea_level);
     } else if (type == "grayscale") {
       output_pgm(file, map);
     } else {

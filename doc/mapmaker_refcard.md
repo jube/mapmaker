@@ -276,22 +276,6 @@ modifiers:
       fraction: 0.5
 ```
 
-### `sea-level`
-
-Parameters:
-
-* `level`: the new level of sea
-
-Example:
-
-```yml
-modifiers:
-  -
-    name: 'sea-level'
-    parameters:
-      level: 0.3
-```
-
 ### `islandize`
 
 Parameters:
