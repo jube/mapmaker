@@ -317,6 +317,22 @@ modifiers:
       border: 0.15
 ```
 
+### `flatten`
+
+Parameters:
+
+* `factor`: the flatten factor (typically `2.0`)
+
+Example:
+
+```yml
+modifiers:
+  -
+    name: 'flatten'
+    parameters:
+      factor: 2.0
+```
+
 ### `intercept`
 
 Parameters:

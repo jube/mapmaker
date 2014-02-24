@@ -17,6 +17,7 @@
 
 #include <chrono>
 #include <mm/fast_erosion.h>
+#include <mm/flatten.h>
 #include <mm/hydraulic_erosion.h>
 #include <mm/islandize.h>
 #include <mm/normalize.h>
@@ -152,6 +153,16 @@ namespace mm {
     return hydraulic_erosion(iterations, rain, solubility, evaporation, capacity);
   }
 
+  static modifier_function get_flatten_modifier(YAML::Node node, heightmap::size_type size) {
+    auto factor_node = node["factor"];
+    if (!factor_node) {
+      throw bad_structure("mapmaker: missing 'factor' in 'flatten' modifier parameters");
+    }
+    auto factor = factor_node.as<double>();
+
+    return flatten(factor);
+  }
+
   /*
    * API
    */
@@ -186,6 +197,10 @@ namespace mm {
 
     if (name == "thermal-erosion") {
       return get_thermal_erosion_modifier(parameters_node, size);
+    }
+
+    if (name == "flatten") {
+      return get_flatten_modifier(parameters_node, size);
     }
 
     return null_modifier;

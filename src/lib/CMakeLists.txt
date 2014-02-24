@@ -7,6 +7,7 @@ set(LIBMM_SRC
   diamond_square.cc
   erosion_score.cc
   fast_erosion.cc
+  flatten.cc
   fractal.cc
   gradient_noise.cc
   heightmap.cc
