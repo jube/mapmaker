@@ -58,10 +58,13 @@ namespace mm {
         print_indent();
         std::printf("\terosion score: " BEGIN_VALUE "%f" END_VALUE "\n", erosion);
 
+        auto island_map = cutoff(0.5)(map);
+
         auto slope_map = slope()(map);
 
         // unit_score
         auto unit_map = cutoff(m_unit_talus)(slope_map);
+        unit_map = logical_combine()(unit_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
         output_planemap(unit_map, "unit1.pnm");
         unit_map = reachability(m_unit_size)(unit_map);
         output_planemap(unit_map, "unit2.pnm");
@@ -72,6 +75,7 @@ namespace mm {
 
         // building score
         auto building_map = cutoff(m_building_talus)(slope_map);
+        building_map = logical_combine()(building_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
         output_planemap(building_map, "building1.pnm");
         building_map = reachability(m_building_size)(building_map);
         output_planemap(building_map, "building2.pnm");
