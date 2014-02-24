@@ -72,6 +72,7 @@ namespace mm {
         unit_map = accessibility()(unit_map);
         output_planemap(unit_map, "unit3.pnm");
         auto unit_score = ratio()(unit_map);
+        print_indent();
         std::printf("\tunit score: " BEGIN_VALUE "%f" END_VALUE "\n", unit_score);
 
         // building score
@@ -83,10 +84,12 @@ namespace mm {
         building_map = logical_combine()(building_map, unit_map, std::logical_and<bool>());
         output_planemap(building_map, "building3.pnm");
         auto building_score = ratio()(building_map);
+        print_indent();
         std::printf("\tbuilding score: " BEGIN_VALUE "%f" END_VALUE "\n", building_score);
 
         // playability score
         auto playability_score = erosion * unit_score * building_score;
+        print_indent();
         std::printf("\tplayability score: " BEGIN_VALUE "%f" END_VALUE "\n", playability_score);
       }
 
