@@ -365,6 +365,7 @@ finalizer:
 
 Parameters:
 
+* `sea_level`: the level of the sea (typically `0.5`)
 * `unit_size`: the size of units (typically `1`)
 * `building_size`: the size of buildings (typically `9`)
 * `unit_talus`: the relative talus difference that a unit can cross (typically `8`)
@@ -376,6 +377,7 @@ Example:
 finalizer:
   name: 'playability'
   parameters:
+    sea_level: 0.5
     unit_size: 1
     building_size: 9
     unit_talus: 8.0
