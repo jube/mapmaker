@@ -20,7 +20,6 @@
 #include <mm/hydraulic_erosion.h>
 #include <mm/islandize.h>
 #include <mm/normalize.h>
-#include <mm/sea_level.h>
 #include <mm/thermal_erosion.h>
 
 #include "exception.h"
@@ -73,16 +72,6 @@ namespace mm {
     auto border = border_node.as<double>();
 
     return islandize(border * size);
-  }
-
-  static modifier_function get_sea_level_modifier(YAML::Node node, heightmap::size_type size) {
-    auto level_node = node["level"];
-    if (!level_node) {
-      throw bad_structure("mapmaker: missing 'level' in 'sea-level' modifier parameters");
-    }
-    auto level = level_node.as<double>();
-
-    return sea_level(level);
   }
 
   static modifier_function get_thermal_erosion_modifier(YAML::Node node, heightmap::size_type size) {
@@ -185,10 +174,6 @@ namespace mm {
 
     if (name == "islandize") {
       return get_islandize_modifier(parameters_node, size);
-    }
-
-    if (name == "sea-level") {
-      return get_sea_level_modifier(parameters_node, size);
     }
 
     if (name == "fast-erosion") {

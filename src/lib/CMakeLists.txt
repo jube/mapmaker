@@ -18,7 +18,6 @@ set(LIBMM_SRC
   normalize.cc
   ratio.cc
   reachability.cc
-  sea_level.cc
   simplex_noise.cc
   slope.cc
   thermal_erosion.cc
