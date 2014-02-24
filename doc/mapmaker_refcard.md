@@ -8,6 +8,31 @@ Parameters:
 
 * `seed`: a seed to generate the map (optional)
 
+## Output
+
+Generators and modifiers can have an `ouput`.
+
+Parameters:
+
+* `output`: the file to generate in [Netpbm format](http://en.wikipedia.org/wiki/Netpbm_format)
+  * `type`: the type of output, one of: `colored`, `grayscale`
+  * `parameters` : the parameters of the output (see below)
+  * `filename`: the name of the file (with a `.pnm` extension)
+
+### `colored`
+
+Parameters:
+
+* `sea_level`: the level of the sea (typically `0.5`)
+
+Example:
+
+```yml
+  output: 'colored'
+  parameters:
+    sea_level: 0.5
+```
+
 ## Generators
 
 Parameters:
@@ -17,9 +42,7 @@ Parameters:
 * `size`: the size of the map (in pixels)
   * `width`: the width of the map (in pixels)
   * `height`: the height of the map (in pixels)
-* `output`: the file to generate in [Netpbm format](http://en.wikipedia.org/wiki/Netpbm_format)
-  * `type`: the type of output, one of: `colored`, `grayscale`
-  * `filename`: the name of the file (with a `.pnm` extension)
+* `output`: see [Ouput](#Output)
 
 ### `midpoint-displacement`
 
@@ -210,7 +233,7 @@ Parameters:
 
 * `name`: the name of the modifier
 * `parameters`: the parameters of the modifier (see below)
-* `output`: see 'Generators'
+* `output`: see [Ouput](#Output)
 
 ### `thermal-erosion`
 
