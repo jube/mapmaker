@@ -103,6 +103,7 @@ generator:
     noise: 'value'
     noise_parameters:
       curve: 'cubic'
+    scale: 1.0
     octaves: 10
     lacunarity: 2.0
     persistence: 0.5
@@ -126,6 +127,7 @@ generator:
     noise: 'gradient'
     noise_parameters:
       curve: 'quintic'
+    scale: 1.0
     octaves: 10
     lacunarity: 2.0
     persistence: 0.5
@@ -143,6 +145,7 @@ generator:
   name: 'fractal'
   parameters:
     noise: 'simplex'
+    scale: 1.0
     octaves: 10
     lacunarity: 2.0
     persistence: 0.5
@@ -170,6 +173,7 @@ generator:
       count: 32
       distance: 'euclidean'
       coeffs: [-1, 1]
+    scale: 1.0
     octaves: 1
     lacunarity: 2.0
     persistence: 0.5
