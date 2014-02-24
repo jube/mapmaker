@@ -21,6 +21,7 @@
 #include <mm/hydraulic_erosion.h>
 #include <mm/islandize.h>
 #include <mm/normalize.h>
+#include <mm/smooth.h>
 #include <mm/thermal_erosion.h>
 
 #include "exception.h"
@@ -163,6 +164,10 @@ namespace mm {
     return flatten(factor);
   }
 
+  static modifier_function get_smooth_modifier(YAML::Node node, heightmap::size_type size) {
+    return smooth();
+  }
+
   /*
    * API
    */
@@ -201,6 +206,10 @@ namespace mm {
 
     if (name == "flatten") {
       return get_flatten_modifier(parameters_node, size);
+    }
+
+    if (name == "smooth") {
+      return get_smooth_modifier(parameters_node, size);
     }
 
     return null_modifier;

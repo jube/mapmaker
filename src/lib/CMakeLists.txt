@@ -21,6 +21,7 @@ set(LIBMM_SRC
   reachability.cc
   simplex_noise.cc
   slope.cc
+  smooth.cc
   thermal_erosion.cc
   value_noise.cc
 )
