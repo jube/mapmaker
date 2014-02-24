@@ -75,7 +75,7 @@ namespace mm {
   planemap<bool> accessibility::operator()(const planemap<bool>& src) {
     planemap<bool> unknown(src);
 
-    position best_pos;
+    position best_pos{0, 0};
     size_type best_count = 0;
 
     for (size_type x = 0; x < unknown.width(); ++x) {
