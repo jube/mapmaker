@@ -83,6 +83,7 @@ Parameters:
 
 * `noise`: the noise function, one of: `value`, `gradient`, `simplex`, `cell`
 * `noise_parameters`: the parameters for the noise function (see below)
+* `scale`: the scale to apply to the noise function inputs (typically 1.0)
 * `octaves`: the number of octaves (typically 10)
 * `lacunarity`: the [lacunarity](http://en.wikipedia.org/wiki/Lacunarity) of the noise, i.e. the factor for the [frequency](http://en.wikipedia.org/wiki/Frequency) at each octave (typically `2.0`)
 * `persistence`: the persistence of the noise, i.e. the factor for the [amplitude](http://en.wikipedia.org/wiki/Amplitude) (typically `0.5`)
