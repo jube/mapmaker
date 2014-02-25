@@ -165,7 +165,13 @@ namespace mm {
   }
 
   static modifier_function get_smooth_modifier(YAML::Node node, heightmap::size_type size) {
-    return smooth();
+    auto iterations_node = node["iterations"];
+    if (!iterations_node) {
+      throw bad_structure("mapmaker: missing 'iterations' in 'smooth' modifier parameters");
+    }
+    auto iterations = iterations_node.as<smooth::size_type>();
+
+    return smooth(iterations);
   }
 
   /*

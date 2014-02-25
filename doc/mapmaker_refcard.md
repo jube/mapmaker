@@ -333,6 +333,23 @@ modifiers:
       factor: 2.0
 ```
 
+### smooth
+
+Parameters:
+
+* `iterations`: the number of times the filter is applied
+
+Example:
+
+```yml
+modifiers:
+  -
+    name: 'smooth'
+    parameters:
+      iterations: 10
+```
+
+
 ### `intercept`
 
 Parameters:

@@ -22,7 +22,17 @@ namespace mm {
 
   class smooth {
   public:
+    typedef std::size_t size_type;
+
+    smooth(size_type iterations)
+    : m_iterations(iterations)
+    {
+    }
+
     heightmap operator()(const heightmap& src) const;
+
+  private:
+    size_type m_iterations;
   };
 
 }
