@@ -317,6 +317,22 @@ modifiers:
       border: 0.15
 ```
 
+### `gaussize`
+
+Parameters:
+
+* `spread`: the spread of the gaussian function (typically `0.3`)
+
+Example:
+
+```yml
+modifiers:
+  -
+    name: 'gaussize'
+    parameters:
+      spread: 0.3
+```
+
 ### `flatten`
 
 Parameters:

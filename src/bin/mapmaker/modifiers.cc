@@ -18,6 +18,7 @@
 #include <chrono>
 #include <mm/fast_erosion.h>
 #include <mm/flatten.h>
+#include <mm/gaussize.h>
 #include <mm/hydraulic_erosion.h>
 #include <mm/islandize.h>
 #include <mm/normalize.h>
@@ -74,6 +75,16 @@ namespace mm {
     auto border = border_node.as<double>();
 
     return islandize(border * size);
+  }
+
+  static modifier_function get_gaussize_modifier(YAML::Node node, heightmap::size_type size) {
+    auto spread_node = node["spread"];
+    if (!spread_node) {
+      throw bad_structure("mapmaker: missing 'spread' in 'gaussize' modifier parameters");
+    }
+    auto spread = spread_node.as<double>();
+
+    return gaussize(spread * size);
   }
 
   static modifier_function get_thermal_erosion_modifier(YAML::Node node, heightmap::size_type size) {
@@ -196,6 +207,10 @@ namespace mm {
 
     if (name == "islandize") {
       return get_islandize_modifier(parameters_node, size);
+    }
+
+    if (name == "gaussize") {
+      return get_gaussize_modifier(parameters_node, size);
     }
 
     if (name == "fast-erosion") {

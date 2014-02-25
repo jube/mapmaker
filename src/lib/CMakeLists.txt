@@ -9,6 +9,7 @@ set(LIBMM_SRC
   fast_erosion.cc
   flatten.cc
   fractal.cc
+  gaussize.cc
   gradient_noise.cc
   heightmap.cc
   hills.cc
