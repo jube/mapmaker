@@ -16,10 +16,6 @@
 #ifndef MM_HEIGHTMAP_H
 #define MM_HEIGHTMAP_H
 
-#include <cmath>
-#include <memory>
-#include <stdexcept>
-
 #include <mm/planemap.h>
 
 namespace mm {

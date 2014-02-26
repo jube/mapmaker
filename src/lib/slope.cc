@@ -15,6 +15,8 @@
  */
 #include <mm/slope.h>
 
+#include <cmath>
+
 namespace mm {
 
   heightmap slope::operator()(const heightmap& src) {
