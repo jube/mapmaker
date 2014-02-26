@@ -2,6 +2,7 @@
 set(LIBMM_SRC
   accessibility.cc
   cell_noise.cc
+  colorize.cc
   colormap.cc
   color_ramp.cc
   cutoff.cc
