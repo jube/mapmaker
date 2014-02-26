@@ -15,7 +15,7 @@
  */
 #include <mm/gaussize.h>
 
-#include <mm/curve.h>
+#include <cmath>
 
 namespace mm {
 
