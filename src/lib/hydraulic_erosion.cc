@@ -18,11 +18,11 @@
 namespace mm {
 
   heightmap hydraulic_erosion::operator()(const heightmap& src) const {
-    heightmap water_map(src.width(), src.height());
-    heightmap water_diff(src.width(), src.height());
+    heightmap water_map(size_only, src);
+    heightmap water_diff(size_only, src);
 
-    heightmap material_map(src.width(), src.height());
-    heightmap material_diff(src.width(), src.height());
+    heightmap material_map(size_only, src);
+    heightmap material_diff(size_only, src);
 
     heightmap map(src);
 

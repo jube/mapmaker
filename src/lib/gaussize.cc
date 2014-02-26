@@ -28,7 +28,7 @@ namespace mm {
     auto x0 = static_cast<double>(src.width()) / 2;
     auto y0 = static_cast<double>(src.height()) / 2;
 
-    heightmap map(src.width(), src.height());
+    heightmap map(size_only, src);
 
     for (size_type x = 0; x < map.width(); ++x) {
       for (size_type y = 0; y < map.height(); ++y) {

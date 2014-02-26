@@ -19,7 +19,7 @@ namespace mm {
 
   heightmap smooth::operator()(const heightmap& src) const {
     heightmap map(src);
-    heightmap out(src.width(), src.height());
+    heightmap out(size_only, src);
 
     for (size_type k = 0; k < m_iterations; ++k) {
 

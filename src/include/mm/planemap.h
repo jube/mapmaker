@@ -28,6 +28,12 @@ namespace mm {
     size_type y;
   };
 
+  struct size_only_t {
+  };
+
+  constexpr size_only_t size_only = size_only_t();
+
+
   template<class T, class Allocator =  std::allocator<T>>
   class planemap {
     static_assert(std::is_default_constructible<T>::value, "T should be default constructible");
@@ -84,6 +90,12 @@ namespace mm {
       for (size_type i = 0; i < end; ++i) {
         m_allocator.construct(m_content + i, other.m_content[i]);
       }
+    }
+
+    template<typename U>
+    planemap(size_only_t, const planemap<U>& other)
+    : planemap(other.width(), other.height())
+    {
     }
 
     planemap(planemap&& other)

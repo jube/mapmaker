@@ -20,7 +20,7 @@ namespace mm {
   heightmap normalize::operator()(const heightmap& src) const {
     typedef typename heightmap::size_type size_type;
 
-    heightmap map(src.width(), src.height());
+    heightmap map(size_only, src);
 
     auto max = src(0, 0);
     auto min = src(0, 0);

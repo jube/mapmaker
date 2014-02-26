@@ -50,6 +50,12 @@ namespace mm {
     {
     }
 
+    template<typename T>
+    heightmap(size_only_t, const planemap<T>& other)
+    : heightmap(other.width(), other.height())
+    {
+    }
+
     heightmap(heightmap&& other)
     : planemap<double>(other)
     {

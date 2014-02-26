@@ -22,7 +22,7 @@ namespace mm {
   heightmap slope::operator()(const heightmap& src) {
     typedef typename heightmap::size_type size_type;
 
-    heightmap map(src.width(), src.height());
+    heightmap map(size_only, src);
 
     for (size_type x = 0; x < src.width(); ++x) {
       for (size_type y = 0; y < src.height(); ++y) {

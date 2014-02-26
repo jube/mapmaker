@@ -21,7 +21,7 @@ namespace mm {
     double d[3][3];
 
     heightmap map(src);
-    heightmap material(src.width(), src.height());
+    heightmap material(size_only, src);
 
     for (size_type k = 0; k < m_iterations; ++k) {
       // initialize material map

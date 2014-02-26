@@ -53,6 +53,12 @@ namespace mm {
     {
     }
 
+    template<typename T>
+    colormap(size_only_t, const planemap<T>& other)
+    : colormap(other.width(), other.height())
+    {
+    }
+
     colormap(colormap&& other)
     : planemap<color>(other)
     {
