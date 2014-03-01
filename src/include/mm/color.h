@@ -58,6 +58,10 @@ namespace mm {
       return m_a;
     }
 
+    void set_alpha_channel(uint8_t a) {
+      m_a = a;
+    }
+
     static constexpr color black() {
       return {0, 0, 0};
     }
