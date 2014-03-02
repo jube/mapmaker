@@ -39,24 +39,6 @@ namespace mm {
     }
   }
 
-  #define WHITE 65535
-
-  static void output_pgm(std::ostream& o, const mm::heightmap& map) {
-    o << "P2\n";
-    o << map.width() << ' ' << map.height() << '\n';
-    o << WHITE << '\n';
-
-    for (std::size_t y = 0; y < map.height(); ++y) {
-      for (std::size_t x = 0; x < map.width(); ++x) {
-        unsigned val = static_cast<unsigned>(map(x, y) * WHITE);
-        assert(0 <= val && val <= WHITE);
-        o << val << ' ';
-      }
-
-      o << '\n';
-    }
-  }
-
   void output_heightmap(const heightmap& map, YAML::Node node) {
     auto filename_node = node["filename"];
     if (!filename_node) {
@@ -103,7 +85,7 @@ namespace mm {
       colored.output_to_ppm(file);
 
     } else if (type == "grayscale") {
-      output_pgm(file, map);
+      map.output_to_pgm(file);
     } else {
       std::printf("Warning! Unknown output type: '%s'. No output generated.\n", type.c_str());
     }
