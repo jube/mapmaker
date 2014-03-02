@@ -98,8 +98,6 @@ namespace mm {
       return {0, 0, 0, 0};
     }
 
-    friend constexpr bool operator==(const color& lhs, const color& rhs);
-
   private:
     uint8_t m_r;
     uint8_t m_g;
