@@ -15,18 +15,15 @@
  */
 #include <mm/logical_combine.h>
 
+#include <cassert>
+
 namespace mm {
 
   binarymap logical_combine::operator()(const binarymap& lhs, const binarymap& rhs, std::function<bool(bool, bool)> func) {
     typedef typename binarymap::size_type size_type;
 
-    if (lhs.width() != rhs.width()) {
-      // TODO
-    }
-
-    if (lhs.height() != rhs.height()) {
-      // TODO
-    }
+    assert(lhs.width() == rhs.width());
+    assert(lhs.height() == rhs.height());
 
     binarymap map(size_only, lhs);
 
