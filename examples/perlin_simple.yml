@@ -13,4 +13,7 @@ generator:
     height: 513
   output:
     type: 'colored'
+    parameters:
+      sea_level: 0.5
+      shaded: true
     filename: 'perlin_simple.pnm'
