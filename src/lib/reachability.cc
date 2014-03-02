@@ -20,10 +20,8 @@ namespace mm {
   binarymap reachability::operator()(const binarymap& src) const {
     binarymap map(src.width(), src.height(), false);
 
-    size_type size2 = (m_size - 1) / 2;
-
-    for (size_type x = 0; x < src.width() - size2; ++x) {
-      for (size_type y = 0; y < src.height() - size2; ++y) {
+    for (size_type x = 0; x < src.width() - m_size; ++x) {
+      for (size_type y = 0; y < src.height() - m_size; ++y) {
         bool reachable = true;
 
         for (size_type i = 0; i < m_size && reachable; ++i) {
