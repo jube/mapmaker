@@ -15,7 +15,7 @@
  */
 #include <mm/islandize.h>
 
-#include <mm/curve.h>
+#include <cmath>
 
 namespace mm {
 
@@ -40,13 +40,9 @@ namespace mm {
           coeffy = static_cast<double>(map.height() - y + 1)/static_cast<double>(m_border);
         }
 
-//         double coeff = std::min(coeffx, coeffy);
-//         double coeff = std::hypot(coeffx, coeffy);
         double coeff = coeffx * coeffy;
 
         if (coeff < 1.0) {
-//           map(x, y) = map(x, y) * std::sqrt(coeff);
-//           map(x, y) = map(x, y) * curve_cubic(coeff);
           map(x, y) = map(x, y) * std::sin(std::sqrt(coeff) * M_PI / 2);
         }
       }
