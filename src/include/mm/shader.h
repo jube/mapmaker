@@ -13,27 +13,29 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
+#ifndef MM_SHADER_H
+#define MM_SHADER_H
 
-#include <mm/binarymap.h>
+#include <mm/colormap.h>
 #include <mm/heightmap.h>
+#include <mm/vector3.h>
 
 namespace mm {
 
-  class cutoff {
+  class shader {
   public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
+    shader(double sea_level)
+    : m_sea_level(sea_level)
     {
     }
 
-    binarymap operator()(const heightmap& src) const;
+    colormap operator()(const colormap& src, const heightmap& map) const;
 
   private:
-    double m_threshold;
+    double m_sea_level;
   };
+
 
 }
 
-#endif // MM_CUTOFF_OPERATOR_H
+#endif // MM_SHADER_H

@@ -13,30 +13,28 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/sea_level.h>
+#include <mm/colormap.h>
+
+#include <iostream>
 
 namespace mm {
 
-  heightmap sea_level::operator()(const heightmap& src) {
-    typedef typename heightmap::size_type size_type;
+  void colormap::output_to_ppm(std::ostream& file) const {
+    file << "P3\n";
+    file << this->width() << ' ' << this->height() << '\n';
+    file << static_cast<unsigned>(mm::color::max) << '\n';
 
-    heightmap map(src.width(), src.height());
+    for (size_type y = 0; y < this->height(); ++y) {
+      for (size_type x = 0; x < this->width(); ++x) {
+        auto c = this->get(x, y);
 
-    for (size_type x = 0; x < src.width(); ++x) {
-      for (size_type y = 0; y < src.height(); ++y) {
-        double value = src(x, y);
-
-        if (value < m_level) {
-          map(x, y) = value / m_level * 0.5;
-        } else {
-          map(x, y) = (value - m_level) / (1.0 - m_level) * 0.5 + 0.5;
-        }
-
+        file << static_cast<unsigned>(c.red_channel()) << ' '
+            << static_cast<unsigned>(c.green_channel()) << ' '
+            << static_cast<unsigned>(c.blue_channel()) << ' ';
       }
+
+      file << '\n';
     }
-
-    return std::move(map);
   }
-
 
 }

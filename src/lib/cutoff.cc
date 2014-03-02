@@ -18,10 +18,10 @@
 namespace mm {
 
 
-  planemap<bool> cutoff::operator()(const heightmap& src) const {
+  binarymap cutoff::operator()(const heightmap& src) const {
     typedef typename heightmap::size_type size_type;
 
-    planemap<bool> map(src.width(), src.height());
+    binarymap map(size_only, src);
 
     for (size_type x = 0; x < map.width(); ++x) {
       for (size_type y = 0; y < map.height(); ++y) {

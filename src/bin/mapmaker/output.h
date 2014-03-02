@@ -25,7 +25,6 @@
 namespace mm {
 
   void output_heightmap(const heightmap& map, YAML::Node node);
-  void output_planemap(const planemap<bool>& map, const std::string& filename);
 
 }
 

@@ -13,27 +13,33 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
+#ifndef MM_COLORIZE_H
+#define MM_COLORIZE_H
 
-#include <mm/binarymap.h>
+#include <mm/colormap.h>
+#include <mm/color_ramp.h>
 #include <mm/heightmap.h>
 
 namespace mm {
 
-  class cutoff {
+  class colorize {
   public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
+    typedef std::size_t size_type;
+
+    colorize(color_ramp ramp, double sea_level)
+    : m_ramp(ramp)
+    , m_sea_level(sea_level)
     {
     }
 
-    binarymap operator()(const heightmap& src) const;
+    colormap operator()(const heightmap& map) const;
 
   private:
-    double m_threshold;
+    color_ramp m_ramp;
+    double m_sea_level;
   };
+
 
 }
 
-#endif // MM_CUTOFF_OPERATOR_H
+#endif // MM_COLORIZE_H

@@ -15,6 +15,9 @@
  */
 #include <mm/heightmap.h>
 
+#include <cassert>
+#include <iostream>
+
 namespace mm {
 
   heightmap heightmap::submap(size_type x, size_type y, size_type w, size_type h) const {
@@ -35,6 +38,24 @@ namespace mm {
     }
 
     return std::move(sub);
+  }
+
+  #define WHITE 65535
+
+  void heightmap::output_to_pgm(std::ostream& file) const {
+    file << "P2\n";
+    file << this->width() << ' ' << this->height() << '\n';
+    file << WHITE << '\n';
+
+    for (size_type y = 0; y < this->height(); ++y) {
+      for (size_type x = 0; x < this->width(); ++x) {
+        unsigned value = static_cast<unsigned>(this->get(x, y) * WHITE);
+        assert(0 <= value && value <= WHITE);
+        file << value << ' ';
+      }
+
+      file << '\n';
+    }
   }
 
 }

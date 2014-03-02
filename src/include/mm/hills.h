@@ -13,28 +13,37 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_SEA_LEVEL_H
-#define MM_SEA_LEVEL_H
+#ifndef MM_HILS_H
+#define MM_HILS_H
 
 #include <mm/heightmap.h>
+#include <mm/random.h>
 
 namespace mm {
 
-  class sea_level {
+  class hills {
   public:
-    sea_level(double level)
-    : m_level(level)
+    typedef std::size_t size_type;
+
+    hills(size_type count, double radius_min, double radius_max)
+    : m_count(count), m_radius_min(radius_min), m_radius_max(radius_max)
     {
+      // just in case
+      if (m_radius_min > m_radius_max) {
+        std::swap(m_radius_min, m_radius_max);
+      }
     }
 
-    heightmap operator()(const heightmap& src);
+    heightmap operator()(random_engine& engine, size_type width, size_type height) const;
 
   private:
-    double m_level;
+    size_type m_count;
+    double m_radius_min;
+    double m_radius_max;
+
   };
 
 
 }
 
-
-#endif // MM_SEA_LEVEL_H
+#endif // MM_HILS_H

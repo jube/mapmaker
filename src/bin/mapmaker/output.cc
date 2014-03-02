@@ -19,73 +19,13 @@
 #include <fstream>
 #include <iostream>
 
+#include <mm/colorize.h>
+#include <mm/shader.h>
+
 #include "exception.h"
 #include "print.h"
 
 namespace mm {
-
-  static void output_pbm(std::ostream& o, const mm::planemap<bool>& map) {
-    o << "P1\n";
-    o << map.width() << ' ' << map.height() << '\n';
-
-    for (std::size_t y = 0; y < map.height(); ++y) {
-      for (std::size_t x = 0; x < map.width(); ++x) {
-        o << (map(x, y) ? '0' : '1') << ' ';
-      }
-
-      o << '\n';
-    }
-  }
-
-  #define WHITE 65535
-
-  static void output_pgm(std::ostream& o, const mm::heightmap& map) {
-    o << "P2\n";
-    o << map.width() << ' ' << map.height() << '\n';
-    o << WHITE << '\n';
-
-    for (std::size_t y = 0; y < map.height(); ++y) {
-      for (std::size_t x = 0; x < map.width(); ++x) {
-        unsigned val = static_cast<unsigned>(map(x, y) * WHITE);
-        assert(0 <= val && val <= WHITE);
-        o << val << ' ';
-      }
-
-      o << '\n';
-    }
-  }
-
-  static void output_ppm(std::ostream& o, const mm::heightmap& map, const mm::color_ramp& ramp) {
-    o << "P3\n";
-    o << map.width() << ' ' << map.height() << '\n';
-    o << static_cast<unsigned>(mm::color::max) << '\n';
-
-    for (std::size_t y = 0; y < map.height(); ++y) {
-      for (std::size_t x = 0; x < map.width(); ++x) {
-        auto color = ramp.get_color(map(x, y));
-        o << static_cast<unsigned>(color.red_channel()) << ' '
-            << static_cast<unsigned>(color.green_channel()) << ' '
-            << static_cast<unsigned>(color.blue_channel()) << ' ';
-      }
-
-      o << '\n';
-    }
-  }
-
-  static void output_color_ramp(std::ostream& o, const mm::color_ramp& ramp) {
-    const std::size_t width = 512;
-    const std::size_t height = 32;
-    mm::heightmap map(width, height);
-
-    for (std::size_t x = 0; x < map.width(); ++x) {
-      double value = static_cast<double>(x) / width;
-      for (std::size_t y = 0; y < map.height(); ++y) {
-        map(x, y) = value;
-      }
-    }
-
-    output_ppm(o, map, ramp);
-  }
 
   void output_heightmap(const heightmap& map, YAML::Node node) {
     auto filename_node = node["filename"];
@@ -106,6 +46,23 @@ namespace mm {
     std::ofstream file(filename);
 
     if (type == "colored") {
+      auto parameters_node = node["parameters"];
+      if (!parameters_node) {
+        throw bad_structure("mapmaker: missing 'parameters' in 'colored' output definition");
+      }
+
+      auto sea_level_node = parameters_node["sea_level"];
+      if (!sea_level_node) {
+        throw bad_structure("mapmaker: missing 'sea_level' in 'colored' output parameters");
+      }
+      auto sea_level = sea_level_node.as<double>();
+
+      auto shaded_node = parameters_node["shaded"];
+      if (!shaded_node) {
+        throw bad_structure("mapmaker: missing 'shaded' in 'colored' output parameters");
+      }
+      auto shaded = shaded_node.as<bool>();
+
       // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
       mm::color_ramp ramp;
       ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
@@ -118,18 +75,20 @@ namespace mm {
       ramp.add_color_stop(0.950, {179, 179, 179}); // grey: rocks
       ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
 
-      output_ppm(file, map, ramp);
+      auto colored = colorize(ramp, sea_level)(map);
+
+      if (shaded) {
+        colored = shader(sea_level)(colored, map);
+      }
+
+      colored.output_to_ppm(file);
+
     } else if (type == "grayscale") {
-      output_pgm(file, map);
+      map.output_to_pgm(file);
     } else {
       std::printf("Warning! Unknown output type: '%s'. No output generated.\n", type.c_str());
     }
 
-  }
-
-  void output_planemap(const planemap<bool>& map, const std::string& filename) {
-    std::ofstream file(filename);
-    output_pbm(file, map);
   }
 
 }

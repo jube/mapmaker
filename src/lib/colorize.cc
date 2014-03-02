@@ -13,27 +13,28 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
-
-#include <mm/binarymap.h>
-#include <mm/heightmap.h>
+#include <mm/colorize.h>
 
 namespace mm {
 
-  class cutoff {
-  public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
-    {
+  colormap colorize::operator()(const heightmap& src) const {
+    colormap map(size_only, src);
+
+    for (heightmap::size_type x = 0; x < src.width(); ++x) {
+      for (heightmap::size_type y = 0; y < src.height(); ++y) {
+        auto value = src(x, y);
+
+        if (value < m_sea_level) {
+          value = value / m_sea_level * 0.5;
+        } else {
+          value = (value - m_sea_level) / (1.0 - m_sea_level) * 0.5 + 0.5;
+        }
+
+        map(x, y) = m_ramp.get_color(value);
+      }
     }
 
-    binarymap operator()(const heightmap& src) const;
-
-  private:
-    double m_threshold;
-  };
+    return std::move(map);
+  }
 
 }
-
-#endif // MM_CUTOFF_OPERATOR_H

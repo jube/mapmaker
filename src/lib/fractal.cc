@@ -26,8 +26,8 @@ namespace mm {
         double frequency = 1.0;
         double amplitude = 1.0;
 
-        const double xf = static_cast<double>(x) / static_cast<double>(width);
-        const double yf = static_cast<double>(y) / static_cast<double>(height);
+        const double xf = static_cast<double>(x) / static_cast<double>(width) * m_scale;
+        const double yf = static_cast<double>(y) / static_cast<double>(height) * m_scale;
 
         for (size_type k = 0; k < m_octaves; ++k) {
           value += m_noise(xf * frequency, yf * frequency) * amplitude;

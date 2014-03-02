@@ -16,7 +16,7 @@
 #ifndef MM_REACHABILITY_H
 #define MM_REACHABILITY_H
 
-#include <mm/planemap.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
@@ -29,7 +29,7 @@ namespace mm {
     {
     }
 
-    planemap<bool> operator()(const planemap<bool>& src) const;
+    binarymap operator()(const binarymap& src) const;
 
   private:
     size_type m_size;

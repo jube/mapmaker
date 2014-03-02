@@ -16,9 +16,7 @@
 #ifndef MM_HEIGHTMAP_H
 #define MM_HEIGHTMAP_H
 
-#include <cmath>
-#include <memory>
-#include <stdexcept>
+#include <iosfwd>
 
 #include <mm/planemap.h>
 
@@ -54,6 +52,12 @@ namespace mm {
     {
     }
 
+    template<typename T>
+    heightmap(size_only_t, const planemap<T>& other)
+    : heightmap(other.width(), other.height())
+    {
+    }
+
     heightmap(heightmap&& other)
     : planemap<double>(other)
     {
@@ -80,6 +84,8 @@ namespace mm {
     // specialized methods
 
     heightmap submap(size_type x, size_type y, size_type w, size_type h) const;
+
+    void output_to_pgm(std::ostream& file) const;
   };
 
 }

@@ -13,27 +13,29 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
-
 #include <mm/binarymap.h>
-#include <mm/heightmap.h>
+
+#include <fstream>
+#include <iostream>
 
 namespace mm {
 
-  class cutoff {
-  public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
-    {
+  void binarymap::output_to_pbm(const std::string& filename) const {
+    std::ofstream file(filename);
+    output_to_pbm(file);
+  }
+
+  void binarymap::output_to_pbm(std::ostream& file) const {
+    file << "P1\n";
+    file << this->width() << ' ' << this->height() << '\n';
+
+    for (size_type y = 0; y < this->height(); ++y) {
+      for (size_type x = 0; x < this->width(); ++x) {
+        file << (this->get(x, y) ? '0' : '1') << ' ';
+      }
+
+      file << '\n';
     }
-
-    binarymap operator()(const heightmap& src) const;
-
-  private:
-    double m_threshold;
-  };
+  }
 
 }
-
-#endif // MM_CUTOFF_OPERATOR_H

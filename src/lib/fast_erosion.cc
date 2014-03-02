@@ -19,7 +19,7 @@ namespace mm {
 
   heightmap fast_erosion::operator()(const heightmap& src) const {
     heightmap map(src);
-    heightmap material(src.width(), src.height());
+    heightmap material(size_only, src);
 
     for (size_type k = 0; k < m_iterations; ++k) {
       // initialize material map

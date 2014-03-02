@@ -24,6 +24,8 @@
 #include <mm/distance.h>
 #include <mm/fractal.h>
 #include <mm/gradient_noise.h>
+#include <mm/hills.h>
+#include <mm/midpoint_displacement.h>
 #include <mm/normalize.h>
 #include <mm/simplex_noise.h>
 #include <mm/value_noise.h>
@@ -33,6 +35,28 @@
 #include "print.h"
 
 namespace mm {
+
+  namespace {
+
+    class ramp {
+    public:
+      typedef typename position::size_type size_type;
+
+      heightmap operator()(random_engine& r, size_type width, size_type height) const {
+        heightmap map(width, height);
+
+        for (size_type x = 0; x < map.width(); ++x) {
+          double value = static_cast<double>(x) / width;
+          for (size_type y = 0; y < map.height(); ++y) {
+            map(x, y) = value;
+          }
+        }
+
+        return std::move(map);
+      }
+    };
+
+  }
 
   /*
    * Noise
@@ -183,6 +207,9 @@ namespace mm {
       noise = null_noise;
     }
 
+    auto scale_node = node["scale"];
+    double scale = (!scale_node) ? 1.0 : scale_node.as<double>();
+
     auto octaves_node = node["octaves"];
     if (!octaves_node) {
       throw bad_structure("mapmaker: missing 'octaves' in 'fractal' generator parameters");
@@ -201,7 +228,7 @@ namespace mm {
     }
     auto persistence = persistence_node.as<double>();
 
-    return fractal(noise, octaves, lacunarity, persistence);
+    return fractal(noise, scale, octaves, lacunarity, persistence);
   }
 
 
@@ -229,6 +256,59 @@ namespace mm {
     double value = values_node.as<double>();
     return diamond_square(value);
   }
+
+  static generator_function get_midpoint_displacement_generator(random_engine& engine, YAML::Node node) {
+    auto values_node = node["values"];
+    if (!values_node) {
+      throw bad_structure("mapmaker: missing 'values' in 'diamond-square' generator parameters");
+    }
+
+    if (values_node.IsSequence()) {
+      if (values_node.size() != 4) {
+        throw bad_structure("mapmaker: wrong array size in 'values' in 'diamond-square' generator parameters");
+      }
+
+      std::array<double, 4> values;
+      for (std::size_t i = 0; i < values_node.size(); ++i) {
+        values.at(i) = values_node[i].as<double>(); // TODO: verify that it is a scalar
+      }
+
+      return midpoint_displacement(values[0], values[1], values[2], values[3]);
+    }
+
+    assert(values_node.IsScalar());
+
+    double value = values_node.as<double>();
+    return midpoint_displacement(value);
+  }
+
+
+  static generator_function get_hills_generator(random_engine& engine, YAML::Node node) {
+    auto count_node = node["count"];
+    if (!count_node) {
+      throw bad_structure("mapmaker: missing 'count' in 'hills' generator parameters");
+    }
+    auto count = count_node.as<hills::size_type>();
+
+    auto radius_min_node = node["radius_min"];
+    if (!radius_min_node) {
+      throw bad_structure("mapmaker: missing 'radius_min' in 'hills' generator parameters");
+    }
+    auto radius_min = radius_min_node.as<double>();
+
+    auto radius_max_node = node["radius_max"];
+    if (!radius_max_node) {
+      throw bad_structure("mapmaker: missing 'radius_max' in 'hills' generator parameters");
+    }
+    auto radius_max = radius_max_node.as<double>();
+
+    return hills(count, radius_min, radius_max);
+  }
+
+  static generator_function get_ramp_generator(random_engine& engine, YAML::Node node) {
+    return ramp();
+  }
+
   /*
    * API
    */
@@ -250,6 +330,18 @@ namespace mm {
 
     if (name == "diamond-square") {
       return get_diamond_square_generator(engine, parameters_node);
+    }
+
+    if (name == "midpoint-displacement") {
+      return get_midpoint_displacement_generator(engine, parameters_node);
+    }
+
+    if (name == "hills") {
+      return get_hills_generator(engine, parameters_node);
+    }
+
+    if (name == "ramp") {
+      return get_ramp_generator(engine, parameters_node);
     }
 
     return null_generator;

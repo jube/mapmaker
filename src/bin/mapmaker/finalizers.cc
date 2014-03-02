@@ -44,11 +44,13 @@ namespace mm {
 
     class playability {
     public:
-      playability(reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus)
-      : m_unit_size(unit_size)
+      playability(double sea_level, reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus, bool output_intermediates)
+      : m_sea_level(sea_level)
+      , m_unit_size(unit_size)
       , m_building_size(building_size)
       , m_unit_talus(unit_talus)
       , m_building_talus(building_talus)
+      , m_output_intermediates(output_intermediates)
       {
       }
 
@@ -58,38 +60,72 @@ namespace mm {
         print_indent();
         std::printf("\terosion score: " BEGIN_VALUE "%f" END_VALUE "\n", erosion);
 
+        auto island_map = cutoff(m_sea_level)(map);
+        auto island_ratio = 1.0 - ratio()(island_map);
+
         auto slope_map = slope()(map);
 
         // unit_score
         auto unit_map = cutoff(m_unit_talus)(slope_map);
-        output_planemap(unit_map, "unit1.pnm");
+        unit_map = logical_combine()(unit_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
+
+        if (m_output_intermediates) {
+          unit_map.output_to_pbm("unit1.pnm");
+        }
+
         unit_map = reachability(m_unit_size)(unit_map);
-        output_planemap(unit_map, "unit2.pnm");
+
+        if (m_output_intermediates) {
+          unit_map.output_to_pbm("unit2.pnm");
+        }
+
         unit_map = accessibility()(unit_map);
-        output_planemap(unit_map, "unit3.pnm");
-        auto unit_score = ratio()(unit_map);
+
+        if (m_output_intermediates) {
+          unit_map.output_to_pbm("unit3.pnm");
+        }
+
+        auto unit_score = ratio()(unit_map) / island_ratio;
+        print_indent();
         std::printf("\tunit score: " BEGIN_VALUE "%f" END_VALUE "\n", unit_score);
 
         // building score
         auto building_map = cutoff(m_building_talus)(slope_map);
-        output_planemap(building_map, "building1.pnm");
+        building_map = logical_combine()(building_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
+
+        if (m_output_intermediates) {
+          building_map.output_to_pbm("building1.pnm");
+        }
+
         building_map = reachability(m_building_size)(building_map);
-        output_planemap(building_map, "building2.pnm");
+
+        if (m_output_intermediates) {
+          building_map.output_to_pbm("building2.pnm");
+        }
+
         building_map = logical_combine()(building_map, unit_map, std::logical_and<bool>());
-        output_planemap(building_map, "building3.pnm");
-        auto building_score = ratio()(building_map);
+
+        if (m_output_intermediates) {
+          building_map.output_to_pbm("building3.pnm");
+        }
+
+        auto building_score = ratio()(building_map) / island_ratio;
+        print_indent();
         std::printf("\tbuilding score: " BEGIN_VALUE "%f" END_VALUE "\n", building_score);
 
         // playability score
         auto playability_score = erosion * unit_score * building_score;
+        print_indent();
         std::printf("\tplayability score: " BEGIN_VALUE "%f" END_VALUE "\n", playability_score);
       }
 
     private:
+      double m_sea_level;
       reachability::size_type m_unit_size;
       reachability::size_type m_building_size;
       double m_unit_talus;
       double m_building_talus;
+      bool m_output_intermediates;
     };
 
   }
@@ -106,6 +142,12 @@ namespace mm {
   }
 
   static finalizer_function get_playability_finalizer(YAML::Node node, heightmap::size_type size) {
+    auto sea_level_node = node["sea_level"];
+    if (!sea_level_node) {
+      throw bad_structure("mapmaker: missing 'sea_level' in 'playability' finalizer parameters");
+    }
+    auto sea_level = sea_level_node.as<double>();
+
     auto nu_node = node["unit_size"];
     if (!nu_node) {
       throw bad_structure("mapmaker: missing 'unit_size' in 'playability' finalizer parameters");
@@ -130,7 +172,13 @@ namespace mm {
     }
     auto tb = tb_node.as<double>();
 
-    return playability(nu, nb, tu / size, tb / size);
+    auto output_intermediates_node = node["output_intermediates"];
+    if (!output_intermediates_node) {
+      throw bad_structure("mapmaker: missing 'output_intermediates' in 'playability' finalizer parameters");
+    }
+    auto output_intermediates = output_intermediates_node.as<bool>();
+
+    return playability(sea_level, nu, nb, tu / size, tb / size, output_intermediates);
   }
 
   /*

@@ -17,10 +17,12 @@
 
 #include <chrono>
 #include <mm/fast_erosion.h>
+#include <mm/flatten.h>
+#include <mm/gaussize.h>
 #include <mm/hydraulic_erosion.h>
 #include <mm/islandize.h>
 #include <mm/normalize.h>
-#include <mm/sea_level.h>
+#include <mm/smooth.h>
 #include <mm/thermal_erosion.h>
 
 #include "exception.h"
@@ -75,14 +77,14 @@ namespace mm {
     return islandize(border * size);
   }
 
-  static modifier_function get_sea_level_modifier(YAML::Node node, heightmap::size_type size) {
-    auto level_node = node["level"];
-    if (!level_node) {
-      throw bad_structure("mapmaker: missing 'level' in 'sea-level' modifier parameters");
+  static modifier_function get_gaussize_modifier(YAML::Node node, heightmap::size_type size) {
+    auto spread_node = node["spread"];
+    if (!spread_node) {
+      throw bad_structure("mapmaker: missing 'spread' in 'gaussize' modifier parameters");
     }
-    auto level = level_node.as<double>();
+    auto spread = spread_node.as<double>();
 
-    return sea_level(level);
+    return gaussize(spread * size);
   }
 
   static modifier_function get_thermal_erosion_modifier(YAML::Node node, heightmap::size_type size) {
@@ -163,6 +165,26 @@ namespace mm {
     return hydraulic_erosion(iterations, rain, solubility, evaporation, capacity);
   }
 
+  static modifier_function get_flatten_modifier(YAML::Node node, heightmap::size_type size) {
+    auto factor_node = node["factor"];
+    if (!factor_node) {
+      throw bad_structure("mapmaker: missing 'factor' in 'flatten' modifier parameters");
+    }
+    auto factor = factor_node.as<double>();
+
+    return flatten(factor);
+  }
+
+  static modifier_function get_smooth_modifier(YAML::Node node, heightmap::size_type size) {
+    auto iterations_node = node["iterations"];
+    if (!iterations_node) {
+      throw bad_structure("mapmaker: missing 'iterations' in 'smooth' modifier parameters");
+    }
+    auto iterations = iterations_node.as<smooth::size_type>();
+
+    return smooth(iterations);
+  }
+
   /*
    * API
    */
@@ -187,8 +209,8 @@ namespace mm {
       return get_islandize_modifier(parameters_node, size);
     }
 
-    if (name == "sea-level") {
-      return get_sea_level_modifier(parameters_node, size);
+    if (name == "gaussize") {
+      return get_gaussize_modifier(parameters_node, size);
     }
 
     if (name == "fast-erosion") {
@@ -201,6 +223,14 @@ namespace mm {
 
     if (name == "thermal-erosion") {
       return get_thermal_erosion_modifier(parameters_node, size);
+    }
+
+    if (name == "flatten") {
+      return get_flatten_modifier(parameters_node, size);
+    }
+
+    if (name == "smooth") {
+      return get_smooth_modifier(parameters_node, size);
     }
 
     return null_modifier;

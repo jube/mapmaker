@@ -13,27 +13,22 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
+#include <mm/flatten.h>
 
-#include <mm/binarymap.h>
-#include <mm/heightmap.h>
+#include <cmath>
 
 namespace mm {
 
-  class cutoff {
-  public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
-    {
+  heightmap flatten::operator()(const heightmap& src) const {
+    heightmap map(src);
+
+    for (heightmap::size_type x = 0; x < map.width(); ++x) {
+      for (heightmap::size_type y = 0; y < map.height(); ++y) {
+        map(x, y) = std::pow(map(x, y), m_factor);
+      }
     }
 
-    binarymap operator()(const heightmap& src) const;
-
-  private:
-    double m_threshold;
-  };
+    return std::move(map);
+  }
 
 }
-
-#endif // MM_CUTOFF_OPERATOR_H

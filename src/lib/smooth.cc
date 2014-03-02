@@ -13,52 +13,52 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/slope.h>
-
-#include <cmath>
+#include <mm/smooth.h>
 
 namespace mm {
 
-  heightmap slope::operator()(const heightmap& src) {
-    typedef typename heightmap::size_type size_type;
+  heightmap smooth::operator()(const heightmap& src) const {
+    heightmap map(src);
+    heightmap out(size_only, src);
 
-    heightmap map(size_only, src);
+    for (size_type k = 0; k < m_iterations; ++k) {
 
-    for (size_type x = 0; x < src.width(); ++x) {
-      for (size_type y = 0; y < src.height(); ++y) {
-        double value = 0.0;
+      for (heightmap::size_type x = 0; x < map.width(); ++x) {
+        for (heightmap::size_type y = 0; y < map.height(); ++y) {
+          double value = 0.0;
+          size_type count = 0;
 
-        for (int i = -1; i <= 1; ++i) {
-          if (x == 0 && i == -1) {
-            continue;
-          }
-
-          if (x == src.width() - 1 && i == 1) {
-            continue;
-          }
-
-          for (int j = -1; j <= 1; ++j) {
-            if (y == 0 && j == -1) {
+          for (int i = -1; i <= 1; ++i) {
+            if (x == 0 && i == -1) {
               continue;
             }
 
-            if (y == src.height() - 1 && j == 1) {
+            if (x == map.width() - 1 && i == 1) {
               continue;
             }
 
-            double diff = std::abs(src(x, y) - src(x+i, y+j));
+            for (int j = -1; j <= 1; ++j) {
+              if (y == 0 && j == -1) {
+                continue;
+              }
 
-            if (diff > value) {
-              value = diff;
+              if (y == map.height() - 1 && j == 1) {
+                continue;
+              }
+
+              value += map(x+i, y+j);
+              count += 1;
             }
           }
+
+          out(x, y) = value / count;
         }
-
-        map(x, y) = value;
       }
+
+      map = out;
     }
 
-    return std::move(map);
+    return std::move(out);
   }
 
 }

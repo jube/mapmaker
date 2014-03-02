@@ -71,10 +71,10 @@ namespace mm {
     size = size + 1;
     heightmap map(size, size);
 
-    map(0, 0) = m_ne;
-    map(0, d) = m_nw;
-    map(d, 0) = m_se;
-    map(d, d) = m_sw;
+    map(0, 0) = m_nw;
+    map(0, d) = m_ne;
+    map(d, 0) = m_sw;
+    map(d, d) = m_se;
 
     while (d >= 2) {
       size_type d_2 = d / 2;

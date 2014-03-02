@@ -13,27 +13,39 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_CUTOFF_OPERATOR_H
-#define MM_CUTOFF_OPERATOR_H
+#ifndef MM_MIDPOINT_DISPLACEMENT_H
+#define MM_MIDPOINT_DISPLACEMENT_H
 
-#include <mm/binarymap.h>
+#include <mm/random.h>
 #include <mm/heightmap.h>
 
 namespace mm {
 
-  class cutoff {
+  class midpoint_displacement {
   public:
-    cutoff(double threshold)
-    : m_threshold(threshold)
+    typedef typename position::size_type size_type;
+
+    midpoint_displacement(double val = 0.0)
+    : m_ne(val), m_nw(val), m_sw(val), m_se(val)
     {
     }
 
-    binarymap operator()(const heightmap& src) const;
+    midpoint_displacement(double ne, double nw, double sw, double se)
+    : m_ne(ne), m_nw(nw), m_sw(sw), m_se(se)
+    {
+    }
+
+    heightmap operator()(random_engine& r, size_type width, size_type height) const;
 
   private:
-    double m_threshold;
+    double m_ne;
+    double m_nw;
+    double m_sw;
+    double m_se;
   };
+
 
 }
 
-#endif // MM_CUTOFF_OPERATOR_H
+
+#endif // MM_MIDPOINT_DISPLACEMENT_H
