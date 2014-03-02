@@ -107,10 +107,6 @@ namespace mm {
     uint8_t m_a;
   };
 
-  constexpr bool operator==(const color& lhs, const color& rhs) {
-    return (lhs.m_r == rhs.m_r) && (lhs.m_g == rhs.m_g) && (lhs.m_b == rhs.m_b) && (lhs.m_a == rhs.m_a);
-  }
-
 }
 
 #endif // MM_COLOR_H
