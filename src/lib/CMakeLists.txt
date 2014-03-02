@@ -23,6 +23,7 @@ set(LIBMM_SRC
   normalize.cc
   ratio.cc
   reachability.cc
+  shader.cc
   simplex_noise.cc
   slope.cc
   smooth.cc

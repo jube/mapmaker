@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include <mm/colorize.h>
+#include <mm/shader.h>
 
 #include "exception.h"
 #include "print.h"
@@ -56,6 +57,12 @@ namespace mm {
       }
       auto sea_level = sea_level_node.as<double>();
 
+      auto shaded_node = parameters_node["shaded"];
+      if (!shaded_node) {
+        throw bad_structure("mapmaker: missing 'shaded' in 'colored' output parameters");
+      }
+      auto shaded = shaded_node.as<bool>();
+
       // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
       mm::color_ramp ramp;
       ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
@@ -69,6 +76,11 @@ namespace mm {
       ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
 
       auto colored = colorize(ramp, sea_level)(map);
+
+      if (shaded) {
+        colored = shader(sea_level)(colored, map);
+      }
+
       colored.output_to_ppm(file);
 
     } else if (type == "grayscale") {

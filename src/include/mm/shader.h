@@ -13,39 +13,29 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_DIAMOND_SQUARE_H
-#define MM_DIAMOND_SQUARE_H
+#ifndef MM_SHADER_H
+#define MM_SHADER_H
 
-#include <mm/random.h>
+#include <mm/colormap.h>
 #include <mm/heightmap.h>
+#include <mm/vector3.h>
 
 namespace mm {
 
-  class diamond_square {
+  class shader {
   public:
-    typedef typename position::size_type size_type;
-
-    diamond_square(double val = 0.0)
-    : m_nw(val), m_ne(val), m_se(val), m_sw(val)
+    shader(double sea_level)
+    : m_sea_level(sea_level)
     {
     }
 
-    diamond_square(double nw, double ne, double se, double sw)
-    : m_nw(nw), m_ne(ne), m_se(se), m_sw(sw)
-    {
-    }
-
-    heightmap operator()(random_engine& r, size_type width, size_type height) const;
+    colormap operator()(const colormap& src, const heightmap& map) const;
 
   private:
-    double m_nw;
-    double m_ne;
-    double m_se;
-    double m_sw;
+    double m_sea_level;
   };
 
 
 }
 
-
-#endif // MM_DIAMOND_SQUARE_H
+#endif // MM_SHADER_H
