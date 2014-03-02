@@ -403,6 +403,7 @@ Parameters:
 * `building_size`: the size of buildings (typically `9`)
 * `unit_talus`: the relative talus difference that a unit can cross (typically `8`)
 * `building_talus`: the relative talus difference that a building can be built on (typically `2`)
+* `output_intermediates`: output the intermediate unit maps and building maps (typically `false`)
 
 Example:
 
@@ -415,4 +416,5 @@ finalizer:
     building_size: 9
     unit_talus: 8.0
     building_talus: 2.0
+    output_intermediates: false
 ```
