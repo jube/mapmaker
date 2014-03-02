@@ -17,8 +17,8 @@
 
 namespace mm {
 
-  double ratio::operator()(const planemap<bool>& src) {
-    typedef typename planemap<bool>::size_type size_type;
+  double ratio::operator()(const binarymap& src) {
+    typedef typename binarymap::size_type size_type;
 
     size_type n = 0;
 

@@ -18,13 +18,13 @@
 
 #include <functional>
 
-#include <mm/planemap.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
   class logical_combine {
   public:
-    planemap<bool> operator()(const planemap<bool>& lhs, const planemap<bool>& rhs, std::function<bool(bool, bool)> func);
+    binarymap operator()(const binarymap& lhs, const binarymap& rhs, std::function<bool(bool, bool)> func);
   };
 
 }

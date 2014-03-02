@@ -66,11 +66,11 @@ namespace mm {
         // unit_score
         auto unit_map = cutoff(m_unit_talus)(slope_map);
         unit_map = logical_combine()(unit_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
-        output_planemap(unit_map, "unit1.pnm");
+        unit_map.output_to_pbm("unit1.pnm");
         unit_map = reachability(m_unit_size)(unit_map);
-        output_planemap(unit_map, "unit2.pnm");
+        unit_map.output_to_pbm("unit2.pnm");
         unit_map = accessibility()(unit_map);
-        output_planemap(unit_map, "unit3.pnm");
+        unit_map.output_to_pbm("unit3.pnm");
         auto unit_score = ratio()(unit_map);
         print_indent();
         std::printf("\tunit score: " BEGIN_VALUE "%f" END_VALUE "\n", unit_score);
@@ -78,11 +78,11 @@ namespace mm {
         // building score
         auto building_map = cutoff(m_building_talus)(slope_map);
         building_map = logical_combine()(building_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
-        output_planemap(building_map, "building1.pnm");
+        building_map.output_to_pbm("building1.pnm");
         building_map = reachability(m_building_size)(building_map);
-        output_planemap(building_map, "building2.pnm");
+        building_map.output_to_pbm("building2.pnm");
         building_map = logical_combine()(building_map, unit_map, std::logical_and<bool>());
-        output_planemap(building_map, "building3.pnm");
+        building_map.output_to_pbm("building3.pnm");
         auto building_score = ratio()(building_map);
         print_indent();
         std::printf("\tbuilding score: " BEGIN_VALUE "%f" END_VALUE "\n", building_score);

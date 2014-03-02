@@ -26,19 +26,6 @@
 
 namespace mm {
 
-  static void output_pbm(std::ostream& o, const mm::planemap<bool>& map) {
-    o << "P1\n";
-    o << map.width() << ' ' << map.height() << '\n';
-
-    for (std::size_t y = 0; y < map.height(); ++y) {
-      for (std::size_t x = 0; x < map.width(); ++x) {
-        o << (map(x, y) ? '0' : '1') << ' ';
-      }
-
-      o << '\n';
-    }
-  }
-
   void output_heightmap(const heightmap& map, YAML::Node node) {
     auto filename_node = node["filename"];
     if (!filename_node) {
@@ -90,11 +77,6 @@ namespace mm {
       std::printf("Warning! Unknown output type: '%s'. No output generated.\n", type.c_str());
     }
 
-  }
-
-  void output_planemap(const planemap<bool>& map, const std::string& filename) {
-    std::ofstream file(filename);
-    output_pbm(file, map);
   }
 
 }

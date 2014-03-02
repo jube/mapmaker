@@ -16,6 +16,8 @@
 #ifndef MM_HEIGHTMAP_H
 #define MM_HEIGHTMAP_H
 
+#include <iosfwd>
+
 #include <mm/planemap.h>
 
 namespace mm {

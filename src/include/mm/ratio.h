@@ -16,13 +16,13 @@
 #ifndef MM_RATIO_H
 #define MM_RATIO_H
 
-#include <mm/planemap.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
   class ratio {
   public:
-    double operator()(const planemap<bool>& map);
+    double operator()(const binarymap& map);
   };
 
 

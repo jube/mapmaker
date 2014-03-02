@@ -19,10 +19,10 @@
 
 namespace mm {
 
-  typedef typename planemap<bool>::size_type size_type;
+  typedef typename binarymap::size_type size_type;
 
   template<typename Func>
-  static size_type walk(planemap<bool>& unknown, position start, Func func) {
+  static size_type walk(binarymap& unknown, position start, Func func) {
     size_type count = 0;
     std::queue<position> q;
     q.push(start);
@@ -72,8 +72,8 @@ namespace mm {
     return count;
   }
 
-  planemap<bool> accessibility::operator()(const planemap<bool>& src) {
-    planemap<bool> unknown(src);
+  binarymap accessibility::operator()(const binarymap& src) {
+    binarymap unknown(src);
 
     position best_pos{0, 0};
     size_type best_count = 0;
@@ -99,7 +99,7 @@ namespace mm {
 
     unknown = src;
 
-    planemap<bool> map(src.width(), src.height(), false);
+    binarymap map(src.width(), src.height(), false);
 
     map(best_pos) = true;
     walk(unknown, best_pos, [&map](position neighbour) {

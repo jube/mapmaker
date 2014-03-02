@@ -16,13 +16,13 @@
 #ifndef MM_ACCESSIBILITY_H
 #define MM_ACCESSIBILITY_H
 
-#include <mm/planemap.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
   class accessibility {
   public:
-    planemap<bool> operator()(const planemap<bool>& src);
+    binarymap operator()(const binarymap& src);
   };
 
 }

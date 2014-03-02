@@ -17,8 +17,8 @@
 
 namespace mm {
 
-  planemap<bool> reachability::operator()(const planemap<bool>& src) const {
-    planemap<bool> map(src.width(), src.height(), false);
+  binarymap reachability::operator()(const binarymap& src) const {
+    binarymap map(src.width(), src.height(), false);
 
     size_type size2 = (m_size - 1) / 2;
 

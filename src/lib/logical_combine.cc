@@ -17,8 +17,8 @@
 
 namespace mm {
 
-  planemap<bool> logical_combine::operator()(const planemap<bool>& lhs, const planemap<bool>& rhs, std::function<bool(bool, bool)> func) {
-    typedef typename planemap<bool>::size_type size_type;
+  binarymap logical_combine::operator()(const binarymap& lhs, const binarymap& rhs, std::function<bool(bool, bool)> func) {
+    typedef typename binarymap::size_type size_type;
 
     if (lhs.width() != rhs.width()) {
       // TODO
@@ -28,7 +28,7 @@ namespace mm {
       // TODO
     }
 
-    planemap<bool> map(lhs.width(), lhs.height());
+    binarymap map(size_only, lhs);
 
     for (size_type x = 0; x < map.width(); ++x) {
       for (size_type y = 0; y < map.height(); ++y) {

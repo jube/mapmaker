@@ -1,6 +1,7 @@
 
 set(LIBMM_SRC
   accessibility.cc
+  binarymap.cc
   cell_noise.cc
   colorize.cc
   colormap.cc
