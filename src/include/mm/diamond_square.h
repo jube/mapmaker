@@ -26,22 +26,22 @@ namespace mm {
     typedef typename position::size_type size_type;
 
     diamond_square(double val = 0.0)
-    : m_ne(val), m_nw(val), m_sw(val), m_se(val)
+    : m_nw(val), m_ne(val), m_se(val), m_sw(val)
     {
     }
 
-    diamond_square(double ne, double nw, double sw, double se)
-    : m_ne(ne), m_nw(nw), m_sw(sw), m_se(se)
+    diamond_square(double nw, double ne, double se, double sw)
+    : m_nw(nw), m_ne(ne), m_se(se), m_sw(sw)
     {
     }
 
     heightmap operator()(random_engine& r, size_type width, size_type height) const;
 
   private:
-    double m_ne;
     double m_nw;
-    double m_sw;
+    double m_ne;
     double m_se;
+    double m_sw;
   };
 
 
