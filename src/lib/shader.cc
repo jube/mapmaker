@@ -134,8 +134,8 @@ namespace mm {
 
         double d = factor(x, y);
 
-        auto lo = lerp(src(x, y), {0x33, 0x33, 0x33}, 0.7);
-        auto hi = lerp(src(x, y), {0xFF, 0xFF, 0xFF}, 0.3);
+        auto lo = lerp(src(x, y), {0x33, 0x11, 0x33}, 0.7);
+        auto hi = lerp(src(x, y), {0xFF, 0xFF, 0xCC}, 0.3);
 
         if (d < 0.5) {
           result(x, y) = lerp(lo, src(x, y), 2 * d);
