@@ -45,7 +45,7 @@ namespace mm {
     m_map.emplace(offset, c);
   }
 
-  color color_ramp::get_color(double offset) const {
+  color color_ramp::compute_color(double offset) const {
     if (offset < m_min || offset > m_max) {
       return color();
     }

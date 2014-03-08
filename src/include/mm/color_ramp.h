@@ -35,7 +35,7 @@ namespace mm {
 
     void add_color_stop(double offset, const color& c);
 
-    color get_color(double offset) const;
+    color compute_color(double offset) const;
 
   private:
     double m_min;

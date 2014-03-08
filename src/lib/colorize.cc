@@ -30,7 +30,7 @@ namespace mm {
           value = (value - m_sea_level) / (1.0 - m_sea_level) * 0.5 + 0.5;
         }
 
-        map(x, y) = m_ramp.get_color(value);
+        map(x, y) = m_ramp.compute_color(value);
       }
     }
 
