@@ -29,7 +29,7 @@ namespace mm {
     {
     }
 
-    heightmap operator()(const heightmap& map) const;
+    heightmap operator()(const heightmap& src) const;
 
   private:
     double m_spread;
