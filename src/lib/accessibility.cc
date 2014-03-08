@@ -106,7 +106,7 @@ namespace mm {
       map(neighbour) = true;
     });
 
-    return std::move(map);
+    return map;
   }
 
 }

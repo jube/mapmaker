@@ -37,7 +37,7 @@ namespace mm {
       }
     }
 
-    return std::move(sub);
+    return sub;
   }
 
   #define WHITE 65535

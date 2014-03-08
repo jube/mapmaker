@@ -58,7 +58,7 @@ namespace mm {
       map = out;
     }
 
-    return std::move(out);
+    return out;
   }
 
 }

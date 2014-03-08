@@ -252,7 +252,7 @@ namespace mm {
       output_heightmap(map, output_node);
     }
 
-    return std::move(map);
+    return map;
   }
 
 }

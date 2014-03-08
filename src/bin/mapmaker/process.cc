@@ -47,7 +47,7 @@ namespace mm {
     auto generator = mm::get_generator(engine, generator_node);
     auto map = mm::generate(engine, generator, generator_node);
 
-    return std::move(map);
+    return map;
   }
 
   heightmap process_modifiers(const heightmap& map, YAML::Node node) {
@@ -70,7 +70,7 @@ namespace mm {
       }
     }
 
-    return std::move(current);
+    return current;
   }
 
   void process_finalizer(const heightmap& map, YAML::Node node) {

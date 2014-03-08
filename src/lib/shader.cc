@@ -146,7 +146,7 @@ namespace mm {
       }
     }
 
-    return std::move(result);
+    return result;
   }
 
 }
