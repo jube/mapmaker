@@ -15,6 +15,8 @@
  */
 #include <mm/hydraulic_erosion.h>
 
+#include <algorithm>
+
 namespace mm {
 
   heightmap hydraulic_erosion::operator()(const heightmap& src) const {
