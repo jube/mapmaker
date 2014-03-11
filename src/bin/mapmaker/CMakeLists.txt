@@ -1,4 +1,5 @@
 include_directories(${YAMLCPP_INCLUDE_DIRS})
+link_directories(${YAMLCPP_LIBRARY_DIRS})
 
 set(MAPMAKER_SRC
   finalizers.cc
