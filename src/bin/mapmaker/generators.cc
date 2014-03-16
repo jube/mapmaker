@@ -16,6 +16,7 @@
 #include "generators.h"
 
 #include <cassert>
+#include <cinttypes>
 #include <chrono>
 
 #include <mm/cell_noise.h>
@@ -372,7 +373,7 @@ namespace mm {
     map = normalize()(map);
     auto end = std::chrono::steady_clock::now();
     auto elapsed = end - start;
-    std::printf("\tduration: %lld ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
+    std::printf("\tduration: %" PRId64 " ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
 
     auto output_node = node["output"];
 

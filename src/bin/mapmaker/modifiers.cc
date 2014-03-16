@@ -15,7 +15,9 @@
  */
 #include "modifiers.h"
 
+#include <cinttypes>
 #include <chrono>
+
 #include <mm/fast_erosion.h>
 #include <mm/flatten.h>
 #include <mm/gaussize.h>
@@ -244,7 +246,7 @@ namespace mm {
     auto elapsed = end - start;
 
     print_indent();
-    std::printf("\tduration: %lld ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
+    std::printf("\tduration: %" PRId64 " ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
 
     auto output_node = node["output"];
 
