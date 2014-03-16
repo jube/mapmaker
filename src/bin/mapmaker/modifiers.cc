@@ -244,7 +244,7 @@ namespace mm {
     auto elapsed = end - start;
 
     print_indent();
-    std::printf("\tduration: %lu ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
+    std::printf("\tduration: %lld ms\n", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count());
 
     auto output_node = node["output"];
 
