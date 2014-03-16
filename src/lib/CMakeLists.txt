@@ -19,6 +19,7 @@ set(LIBMM_SRC
   heightmap.cc
   hills.cc
   hydraulic_erosion.cc
+  invert.cc
   islandize.cc
   logical_combine.cc
   midpoint_displacement.cc
