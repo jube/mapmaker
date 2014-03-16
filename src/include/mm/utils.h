@@ -13,23 +13,44 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/colorize.h>
-
-#include <mm/utils.h>
+#ifndef MM_TILE_H
+#define MM_TILE_H
 
 namespace mm {
 
-  colormap colorize::operator()(const heightmap& src) const {
-    colormap map(size_only, src);
-
-    for (heightmap::size_type x = 0; x < src.width(); ++x) {
-      for (heightmap::size_type y = 0; y < src.height(); ++y) {
-        auto value = value_with_sea_level(src(x, y), m_sea_level);
-        map(x, y) = m_ramp.compute_color(value);
-      }
+  inline
+  double value_with_sea_level(double value, double sea_level) {
+    if (value < sea_level) {
+      return value / sea_level * 0.5;
     }
 
-    return map;
+    return (value - sea_level) / (1.0 - sea_level) * 0.5 + 0.5;
+  }
+
+  inline
+  double value_without_sea_level(double value, double sea_level) {
+    if (value < 0.5) {
+      return value / 0.5 * sea_level;
+    }
+
+    return (value - 0.5) / 0.5 * (1.0 - sea_level) + sea_level;
+  }
+
+  inline
+  double clamp(double value, double min, double max) {
+    if (value < min) {
+      return min;
+    }
+
+    if (value > max) {
+      return max;
+    }
+
+    return value;
   }
 
 }
+
+#endif // MM_TILE_H
+
+
