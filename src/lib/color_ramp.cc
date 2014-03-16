@@ -15,7 +15,12 @@
  */
 #include <mm/color_ramp.h>
 
+#include <cassert>
+#include <algorithm>
+#include <string>
+
 #include <mm/curve.h>
+#include <mm/utils.h>
 
 namespace mm {
 
@@ -65,6 +70,65 @@ namespace mm {
     }
 
     return lerp(c1, c2, (offset - t1) / (t2 - t1));
+  }
+
+  tileset color_ramp::compute_tileset(double sea_level) const {
+    std::vector<double> limits;
+
+    double prev = -1.0;
+    for (auto value : m_map) {
+      if (prev < 0) {
+        prev = value.first;
+      } else {
+        double curr = value.first;
+        double limit = (prev + curr) / 2.0;
+        prev = curr;
+        limits.push_back(value_without_sea_level(limit, sea_level));
+      }
+    }
+    limits.push_back(1.0);
+    assert(m_map.size() == limits.size());
+    assert(std::is_sorted(limits.begin(), limits.end()));
+
+    tileset set;
+    set.add_terrain({ "river", { 19, 149, 255 }, { sea_level, 1 }, { 0, 1 }, true }); // river
+
+    prev = 0.0;
+    std::size_t index = 0;
+    for (auto value : m_map) {
+      std::string name = "biome #" + std::to_string(index);
+
+      double curr = limits[index];
+
+      if (prev < sea_level && curr > sea_level) {
+        set.add_terrain({ name, value.second, { prev, sea_level }, { 0, 1 }, true });
+        set.add_terrain({ name, value.second, { sea_level, curr }, { 0, 1 }, false });
+      } else {
+        set.add_terrain({ name, value.second, { prev, curr }, { 0, 1 }, curr < sea_level });
+      }
+
+      prev = curr;
+      index++;
+    }
+
+    return set;
+  }
+
+
+  color_ramp color_ramp::basic() {
+    // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
+    color_ramp ramp;
+    ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
+    ramp.add_color_stop(0.250, {  9,  62,  92}); // dark blue: water
+    ramp.add_color_stop(0.490, { 17,  82, 112}); // blue: shallow water
+    ramp.add_color_stop(0.500, { 69, 108, 118}); // light blue: shore
+    ramp.add_color_stop(0.501, { 42, 102,  41}); // green: grass
+    ramp.add_color_stop(0.750, {115, 128,  77}); // light green: veld
+    ramp.add_color_stop(0.850, {153, 143,  92}); // brown: tundra
+    ramp.add_color_stop(0.950, {179, 179, 179}); // grey: rocks
+    ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
+
+    return ramp;
   }
 
 }

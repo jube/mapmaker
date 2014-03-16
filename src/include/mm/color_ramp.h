@@ -19,6 +19,7 @@
 #include <map>
 
 #include <mm/color.h>
+#include <mm/tileset.h>
 
 namespace mm {
 
@@ -36,6 +37,10 @@ namespace mm {
     void add_color_stop(double offset, const color& c);
 
     color compute_color(double offset) const;
+
+    tileset compute_tileset(double sea_level) const;
+
+    static color_ramp basic();
 
   private:
     double m_min;
