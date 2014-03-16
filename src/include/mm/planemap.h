@@ -231,6 +231,57 @@ namespace mm {
       std::swap(m_content, other.m_content);
     }
 
+    template<typename Func>
+    void visit4neighbours(size_type x, size_type y, Func func) const {
+      if (x > 0) {
+        position pos{x - 1, y};
+        func(pos, get(pos));
+      }
+
+      if (x < m_w - 1) {
+        position pos{x + 1, y};
+        func(pos, get(pos));
+      }
+
+      if (y > 0) {
+        position pos{x, y - 1};
+        func(pos, get(pos));
+      }
+
+      if (y < m_h - 1) {
+        position pos{x, y + 1};
+        func(pos, get(pos.x, pos.y));
+      }
+    }
+
+    template<typename Func>
+    void visit8neighbours(size_type x, size_type y, Func func) const {
+      for (int i = -1; i <= 1; ++i) {
+        if (x == 0 && i == -1) {
+          continue;
+        }
+
+        if (x == m_w - 1 && i == 1) {
+          continue;
+        }
+
+        for (int j = -1; j <= 1; ++j) {
+          if (y == 0 && j == -1) {
+            continue;
+          }
+
+          if (y == m_h - 1 && j == 1) {
+            continue;
+          }
+
+          if (i != 0 || j != 0) {
+            position pos{x + i, y + j};
+            func(pos, get(pos.x, pos.y));
+          }
+        }
+      }
+    }
+
   protected:
 
     reference get(size_type x, size_type y) const {
