@@ -5,6 +5,7 @@ project(MM CXX)
 include(CPackConfig.cmake)
 
 find_package(PkgConfig REQUIRED)
+find_package(Boost REQUIRED)
 
 pkg_check_modules(YAMLCPP yaml-cpp)
 
@@ -16,7 +17,7 @@ else (WIN32)
   add_definitions(-std=c++11)
 endif (WIN32)
 
-include_directories("${CMAKE_SOURCE_DIR}/include")
+include_directories("${CMAKE_SOURCE_DIR}/include" ${Boost_INCLUDE_DIRS})
 
 add_subdirectory(lib)
 add_subdirectory(bin)
