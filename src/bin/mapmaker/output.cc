@@ -19,7 +19,10 @@
 #include <fstream>
 #include <iostream>
 
+#include <mm/biomize.h>
 #include <mm/colorize.h>
+#include <mm/tilemap.h>
+#include <mm/tileset.h>
 #include <mm/shader.h>
 
 #include "exception.h"
@@ -27,7 +30,7 @@
 
 namespace mm {
 
-  void output_heightmap(const heightmap& map, YAML::Node node) {
+  void output_heightmap(const heightmap& map, YAML::Node node, random_engine& engine) {
     auto filename_node = node["filename"];
     if (!filename_node) {
       throw bad_structure("mapmaker: missing 'filename' in output definition");
@@ -63,18 +66,7 @@ namespace mm {
       }
       auto shaded = shaded_node.as<bool>();
 
-      // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
-      mm::color_ramp ramp;
-      ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
-      ramp.add_color_stop(0.250, {  9,  62,  92}); // dark blue: water
-      ramp.add_color_stop(0.490, { 17,  82, 112}); // blue: shallow water
-      ramp.add_color_stop(0.500, { 69, 108, 118}); // light blue: shore
-      ramp.add_color_stop(0.501, { 42, 102,  41}); // green: grass
-      ramp.add_color_stop(0.750, {115, 128,  77}); // light green: veld
-      ramp.add_color_stop(0.850, {153, 143,  92}); // brown: tundra
-      ramp.add_color_stop(0.950, {179, 179, 179}); // grey: rocks
-      ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
-
+      color_ramp ramp = color_ramp::basic();
       auto colored = colorize(ramp, sea_level)(map);
 
       if (shaded) {
@@ -82,6 +74,39 @@ namespace mm {
       }
 
       colored.output_to_ppm(file);
+
+    } else if (type == "tiled") {
+      auto parameters_node = node["parameters"];
+      if (!parameters_node) {
+        throw bad_structure("mapmaker: missing 'parameters' in 'tiled' output definition");
+      }
+
+      auto sea_level_node = parameters_node["sea_level"];
+      if (!sea_level_node) {
+        throw bad_structure("mapmaker: missing 'sea_level' in 'tiled' output parameters");
+      }
+      auto sea_level = sea_level_node.as<double>();
+
+      auto rivers_node = parameters_node["rivers"];
+      if (!rivers_node) {
+        throw bad_structure("mapmaker: missing 'rivers' in 'tiled' output parameters");
+      }
+      auto rivers = rivers_node.as<unsigned>();
+
+      auto min_source_altitude_node = parameters_node["min_source_altitude"];
+      if (!min_source_altitude_node) {
+        throw bad_structure("mapmaker: missing 'min_source_altitude' in 'tiled' output parameters");
+      }
+      auto min_source_altitude = min_source_altitude_node.as<double>();
+
+      tileset set = color_ramp::basic().compute_tileset(sea_level);
+
+      std::ofstream tilesetfile("tileset.ppm");
+      set.output_to_ppm(tilesetfile);
+
+//       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
+//       auto colored = biomize()(tiled, set);
+//       colored.output_to_ppm(file);
 
     } else if (type == "grayscale") {
       map.output_to_pgm(file);

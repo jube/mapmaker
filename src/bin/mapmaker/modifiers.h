@@ -19,14 +19,15 @@
 #include <functional>
 
 #include <mm/heightmap.h>
+#include <mm/random.h>
 #include <yaml-cpp/yaml.h>
 
 namespace mm {
 
   typedef std::function<heightmap(const heightmap&)> modifier_function;
 
-  modifier_function get_modifier(YAML::Node node, heightmap::size_type size);
-  heightmap modify(const heightmap& map, modifier_function modifier, YAML::Node node);
+  modifier_function get_modifier(YAML::Node node, heightmap::size_type size, random_engine& engine);
+  heightmap modify(const heightmap& map, modifier_function modifier, YAML::Node node, random_engine& engine);
 
 }
 

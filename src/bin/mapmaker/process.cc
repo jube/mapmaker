@@ -15,8 +15,6 @@
  */
 #include "process.h"
 
-#include <cinttypes>
-
 #include "exception.h"
 #include "finalizers.h"
 #include "generators.h"
@@ -25,20 +23,7 @@
 
 namespace mm {
 
-  heightmap process_generator(YAML::Node node) {
-    mm::random_engine::result_type seed = 0;
-
-    auto seed_node = node["seed"];
-    if (seed_node) {
-      seed = seed_node.as<mm::random_engine::result_type>();
-    } else {
-      std::random_device dev;
-      seed = dev();
-      std::printf("Using 'random_device' for seed: %" PRIuFAST64 "\n", seed);
-    }
-
-    mm::random_engine engine(seed);
-
+  heightmap process_generator(YAML::Node node, random_engine& engine) {
     auto generator_node = node["generator"];
     if (!generator_node) {
       throw mm::bad_structure("mapmaker: missing 'generator' definition");
@@ -50,7 +35,7 @@ namespace mm {
     return map;
   }
 
-  heightmap process_modifiers(const heightmap& map, YAML::Node node) {
+  heightmap process_modifiers(const heightmap& map, YAML::Node node, random_engine& engine) {
     heightmap current(map);
 
     auto size_max = std::max(map.width(), map.height());
@@ -65,15 +50,15 @@ namespace mm {
       }
 
       for (auto modifier_node : modifiers_node) {
-        auto modifier = mm::get_modifier(modifier_node, size);
-        current = mm::modify(current, modifier, modifier_node);
+        auto modifier = mm::get_modifier(modifier_node, size, engine);
+        current = mm::modify(current, modifier, modifier_node, engine);
       }
     }
 
     return current;
   }
 
-  void process_finalizer(const heightmap& map, YAML::Node node) {
+  void process_finalizer(const heightmap& map, YAML::Node node, random_engine& engine) {
     auto size_max = std::max(map.width(), map.height());
     auto size_min = std::min(map.width(), map.height());
     auto size = size_min + (size_max - size_min) / 2; // to avoid overflow

@@ -377,7 +377,7 @@ namespace mm {
     auto output_node = node["output"];
 
     if (output_node) {
-      output_heightmap(map, output_node);
+      output_heightmap(map, output_node, engine);
     }
 
     return map;
