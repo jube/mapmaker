@@ -24,17 +24,17 @@ namespace mm {
 
     for (heightmap::size_type x = 0; x < src.width(); ++x) {
       for (heightmap::size_type y = 0; y < src.height(); ++y) {
-        const double alt = src(x, y);
-        double max = 0.0;
+        const double altitude_here = src(x, y);
+        double altitude_difference_max = 0.0;
 
-        src.visit8neighbours(x, y, [alt, &max](position pos, double value) {
-          double diff = std::abs(alt - value);
-          if (diff > max) {
-            max = diff;
+        src.visit8neighbours(x, y, [altitude_here, &altitude_difference_max](position pos, double altitude_there) {
+          double altitude_difference = std::abs(altitude_here - altitude_there);
+          if (altitude_difference > altitude_difference_max) {
+            altitude_difference_max = altitude_difference;
           }
         });
 
-        map(x, y) = max;
+        map(x, y) = altitude_difference_max;
       }
     }
 
