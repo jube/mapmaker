@@ -17,6 +17,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <queue>
 
 namespace mm {
 
@@ -36,6 +37,37 @@ namespace mm {
 
       file << '\n';
     }
+  }
+
+  binarymap::size_type binarymap::walk(position start, std::function<void(position)> func) {
+    size_type count = 0;
+
+    std::queue<position> queue;
+    queue.push(start);
+
+    get(start) = true;
+
+    while (!queue.empty()) {
+      position pos = queue.front();
+
+      if (func) {
+        func(pos);
+      }
+
+      visit4neighbours(pos, [&queue](position neighbour, bool& visited) {
+        if (visited) {
+          return; // already visited
+        }
+
+        visited = true;
+        queue.push(neighbour);
+      });
+
+      queue.pop();
+      count++;
+    }
+
+    return count;
   }
 
 }

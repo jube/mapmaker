@@ -319,7 +319,7 @@ namespace mm {
     }
 
     reference operator()(position pos) {
-      return get(pos.x, pos.y);
+      return get(pos);
     }
 
     reference operator()(fast_position pos) {
@@ -331,7 +331,7 @@ namespace mm {
     }
 
     const_reference operator()(position pos) const {
-      return get(pos.x, pos.y);
+      return get(pos);
     }
 
     const_reference operator()(fast_position pos) const {
@@ -375,6 +375,34 @@ namespace mm {
     }
 
     // visitors
+
+    template<typename Func>
+    void visit4neighbours(size_type x, size_type y, Func func) {
+      if (x > 0) {
+        position pos{x - 1, y};
+        func(pos, get(pos));
+      }
+
+      if (x < m_w - 1) {
+        position pos{x + 1, y};
+        func(pos, get(pos));
+      }
+
+      if (y > 0) {
+        position pos{x, y - 1};
+        func(pos, get(pos));
+      }
+
+      if (y < m_h - 1) {
+        position pos{x, y + 1};
+        func(pos, get(pos));
+      }
+    }
+
+    template<typename Func>
+    void visit4neighbours(position pos, Func func) {
+      visit4neighbours(pos.x, pos.y, func);
+    }
 
     template<typename Func>
     void visit4neighbours(size_type x, size_type y, Func func) const {
@@ -469,11 +497,19 @@ namespace mm {
 
   protected:
 
-    reference get(size_type x, size_type y) const {
+    reference get(size_type x, size_type y) {
       return m_content[x * m_h + y];
     }
 
-    reference get(position pos) const {
+    const_reference get(size_type x, size_type y) const {
+      return m_content[x * m_h + y];
+    }
+
+    reference get(position pos) {
+      return get(pos.x, pos.y);
+    }
+
+    const_reference get(position pos) const {
       return get(pos.x, pos.y);
     }
 
