@@ -13,37 +13,22 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILE_H
-#define MM_TILE_H
+#include <mm/tile.h>
+
+#define TILE_N 0
+#define TILE_S 1
+#define TILE_W 0
+#define TILE_E 1
 
 namespace mm {
 
-  class tile {
-  public:
-
-    enum class detail {
-      NW,
-      NE,
-      SW,
-      SE,
-    };
-
-    tile()
-    : m_biome(-1)
-    {
-    }
-
-    int biome() const {
-      return m_biome;
-    }
-
-    void set_biome(int biome);
-
-  private:
-    int m_biome;
-    int m_details[2][2];
-  };
+  void tile::set_biome(int biome) {
+    m_biome = biome;
+    m_details[TILE_N][TILE_W] = biome;
+    m_details[TILE_N][TILE_E] = biome;
+    m_details[TILE_S][TILE_W] = biome;
+    m_details[TILE_S][TILE_E] = biome;
+  }
 
 }
 
-#endif // MM_TILE_H

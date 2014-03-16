@@ -29,6 +29,7 @@ set(LIBMM_SRC
   simplex_noise.cc
   slope.cc
   smooth.cc
+  tile.cc
   tilemap.cc
   tileset.cc
   thermal_erosion.cc
