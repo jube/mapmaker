@@ -86,6 +86,7 @@ namespace mm {
     heightmap submap(size_type x, size_type y, size_type w, size_type h) const;
 
     void output_to_pgm(std::ostream& file) const;
+    void output_to_pgm(const std::string& filename) const;
   };
 
 }

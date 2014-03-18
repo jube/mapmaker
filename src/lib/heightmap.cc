@@ -16,6 +16,7 @@
 #include <mm/heightmap.h>
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 
 namespace mm {
@@ -56,6 +57,11 @@ namespace mm {
 
       file << '\n';
     }
+  }
+
+  void heightmap::output_to_pgm(const std::string& filename) const {
+    std::ofstream file(filename);
+    output_to_pgm(file);
   }
 
 }
