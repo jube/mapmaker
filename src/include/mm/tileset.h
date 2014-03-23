@@ -38,6 +38,8 @@ namespace mm {
 
     void output_to_ppm(std::ostream& file) const;
 
+    static tileset whittaker();
+
   private:
     int m_terrain_id;
     std::map<int, biome> m_terrains;

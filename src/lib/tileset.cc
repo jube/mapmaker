@@ -63,4 +63,42 @@ namespace mm {
     auto colored = biomize()(map, *this);
     colored.output_to_ppm(file);
   }
+
+
+  tileset tileset::whittaker() {
+    tileset set;
+    /*
+     * water
+     */
+    set.add_terrain({ "Ocean",                      { 0x44, 0x44, 0x7A }, { 0, 0.5 }, { 0, 1 }, true });
+    set.add_terrain({ "Marsh",                      { 0x2F, 0x66, 0x66 }, { 0.5, 0.55 }, { 0, 1 }, true });
+    set.add_terrain({ "Lake",                       { 0x33, 0x66, 0x99 }, { 0.55, 0.9 }, { 0, 1 }, true });
+    set.add_terrain({ "Ice",                        { 0x99, 0xFF, 0xFF }, { 0.9, 1 }, { 0, 1 }, true });
+    /*
+     * non-water
+     */
+    set.add_terrain({ "Beach",                      { 0xA0, 0x90, 0x77 }, { 0.5, 0.52 }, { 0, 1 }, false });
+    // low altitudes
+    set.add_terrain({ "Subtropical Desert",         { 0xD2, 0xB9, 0x8B }, { 0.52, 0.65 }, { 0, 0.16 }, false });
+    set.add_terrain({ "Grassland",                  { 0x88, 0xAA, 0x55 }, { 0.52, 0.65 }, { 0.16, 0.33 }, false });
+    set.add_terrain({ "Tropical Seasonal Forest",   { 0x55, 0x99, 0x44 }, { 0.52, 0.65 }, { 0.33, 0.66 }, false });
+    set.add_terrain({ "Tropical Rain Forest",       { 0x33, 0x77, 0x55 }, { 0.52, 0.65 }, { 0.66, 1 }, false });
+    // mid altitudes
+    set.add_terrain({ "Temperate Desert",           { 0xC9, 0xD2, 0x9B }, { 0.65, 0.8 }, { 0, 0.16 }, false });
+    set.add_terrain({ "Grassland",                  { 0x88, 0xAA, 0x55 }, { 0.65, 0.8 }, { 0.16, 0.5 }, false });
+    set.add_terrain({ "Temperate Deciduous Forest", { 0x67, 0x94, 0x59 }, { 0.65, 0.8 }, { 0.5, 0.83 }, false });
+    set.add_terrain({ "Temperate Rain Forest",      { 0x44, 0x88, 0x55 }, { 0.65, 0.8 }, { 0.83, 1 }, false });
+    // high altitudes
+    set.add_terrain({ "Temperate Desert",           { 0xC9, 0xD2, 0x9B }, { 0.8, 0.9 }, { 0, 0.33 }, false });
+    set.add_terrain({ "Shrubland",                  { 0x88, 0x99, 0x77 }, { 0.8, 0.9 }, { 0.33, 0.66 }, false });
+    set.add_terrain({ "Taiga",                      { 0x99, 0xAA, 0x77 }, { 0.8, 0.9 }, { 0.66, 1 }, false });
+    // very high altitudes
+    set.add_terrain({ "Scorched",                   { 0x55, 0x55, 0x55 }, { 0.9, 1 }, { 0, 0.16 }, false });
+    set.add_terrain({ "Bare",                       { 0x88, 0x88, 0x88 }, { 0.9, 1 }, { 0.16, 0.33 }, false });
+    set.add_terrain({ "Tundra",                     { 0xBB, 0xBB, 0xAA }, { 0.9, 1 }, { 0.33, 0.5 }, false });
+    set.add_terrain({ "Snow",                       { 0xFF, 0xFF, 0xFF }, { 0.9, 1 }, { 0.5, 1 }, false });
+
+    return set;
+  }
+
 }
