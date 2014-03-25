@@ -21,6 +21,7 @@
 
 #include <mm/biomize.h>
 #include <mm/colorize.h>
+#include <mm/decorate.h>
 #include <mm/tilemap.h>
 #include <mm/tileset.h>
 #include <mm/shader.h>
@@ -99,14 +100,18 @@ namespace mm {
       }
       auto min_source_altitude = min_source_altitude_node.as<double>();
 
-      tileset set = color_ramp::basic().compute_tileset(sea_level);
+//       tileset set = color_ramp::basic().compute_tileset(sea_level);
+      tileset set = tileset::whittaker();
 
       std::ofstream tilesetfile("tileset.ppm");
       set.output_to_ppm(tilesetfile);
 
-//       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
-//       auto colored = biomize()(tiled, set);
-//       colored.output_to_ppm(file);
+      auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
+      auto colored = biomize()(tiled, set);
+
+//       colored = shader(sea_level)(colored, map);
+
+      colored.output_to_ppm(file);
 
     } else if (type == "grayscale") {
       map.output_to_pgm(file);

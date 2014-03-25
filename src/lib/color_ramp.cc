@@ -72,7 +72,7 @@ namespace mm {
     return lerp(c1, c2, (offset - t1) / (t2 - t1));
   }
 
-  tileset color_ramp::compute_tileset(double sea_level) const {
+  tileset color_ramp::compute_tileset() const {
     std::vector<double> limits;
 
     double prev = -1.0;
@@ -83,7 +83,7 @@ namespace mm {
         double curr = value.first;
         double limit = (prev + curr) / 2.0;
         prev = curr;
-        limits.push_back(value_without_sea_level(limit, sea_level));
+        limits.push_back(limit);
       }
     }
     limits.push_back(1.0);
@@ -91,20 +91,20 @@ namespace mm {
     assert(std::is_sorted(limits.begin(), limits.end()));
 
     tileset set;
-    set.add_terrain({ "river", { 19, 149, 255 }, { sea_level, 1 }, { 0, 1 }, true }); // river
+    set.add_terrain({ "River", { 19, 149, 255 }, { 0.5, 1 }, { 0, 1 }, true }); // river
 
     prev = 0.0;
     std::size_t index = 0;
     for (auto value : m_map) {
-      std::string name = "biome #" + std::to_string(index);
+      std::string name = "Biome #" + std::to_string(index);
 
       double curr = limits[index];
 
-      if (prev < sea_level && curr > sea_level) {
-        set.add_terrain({ name, value.second, { prev, sea_level }, { 0, 1 }, true });
-        set.add_terrain({ name, value.second, { sea_level, curr }, { 0, 1 }, false });
+      if (prev < 0.5 && 0.5 < curr) {
+        set.add_terrain({ name, value.second, { prev, 0.5 }, { 0, 1 }, true });
+        set.add_terrain({ name, value.second, { 0.5, curr }, { 0, 1 }, false });
       } else {
-        set.add_terrain({ name, value.second, { prev, curr }, { 0, 1 }, curr < sea_level });
+        set.add_terrain({ name, value.second, { prev, curr }, { 0, 1 }, curr < 0.5 });
       }
 
       prev = curr;

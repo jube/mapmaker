@@ -13,8 +13,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILE_H
-#define MM_TILE_H
+#ifndef MM_UTILS_H
+#define MM_UTILS_H
 
 namespace mm {
 
@@ -25,15 +25,6 @@ namespace mm {
     }
 
     return (value - sea_level) / (1.0 - sea_level) * 0.5 + 0.5;
-  }
-
-  inline
-  double value_without_sea_level(double value, double sea_level) {
-    if (value < 0.5) {
-      return value / 0.5 * sea_level;
-    }
-
-    return (value - 0.5) / 0.5 * (1.0 - sea_level) + sea_level;
   }
 
   inline
@@ -51,6 +42,6 @@ namespace mm {
 
 }
 
-#endif // MM_TILE_H
+#endif // MM_UTILS_H
 
 

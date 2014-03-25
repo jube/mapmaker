@@ -9,6 +9,7 @@ set(LIBMM_SRC
   colormap.cc
   color_ramp.cc
   cutoff.cc
+  decorate.cc
   diamond_square.cc
   erosion_score.cc
   fast_erosion.cc

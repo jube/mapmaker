@@ -13,41 +13,33 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_COLOR_RAMP_H
-#define MM_COLOR_RAMP_H
+#ifndef MM_DECORATE_H
+#define MM_DECORATE_H
 
-#include <map>
-
-#include <mm/color.h>
+#include <mm/heightmap.h>
+#include <mm/random.h>
+#include <mm/tilemap.h>
 #include <mm/tileset.h>
 
 namespace mm {
 
-  class color_ramp {
+  class decorate {
   public:
-    color_ramp()
-    : m_min(0.0), m_max(0.0)
+    decorate(double sea_level, unsigned rivers, double min_source_altitude)
+    : m_sea_level(sea_level)
+    , m_rivers(rivers)
+    , m_min_source_altitude(min_source_altitude)
     {
     }
 
-    bool empty() const {
-      return m_map.empty();
-    }
-
-    void add_color_stop(double offset, const color& c);
-
-    color compute_color(double offset) const;
-
-    tileset compute_tileset() const;
-
-    static color_ramp basic();
+    tilemap operator()(const heightmap& src, const tileset& set, random_engine& engine) const;
 
   private:
-    double m_min;
-    double m_max;
-    std::map<double, color> m_map;
+    double m_sea_level;
+    unsigned m_rivers;
+    double m_min_source_altitude;
   };
 
 }
 
-#endif // MM_COLOR_RAMP_H
+#endif // MM_DECORATE_H
