@@ -30,5 +30,24 @@ namespace mm {
     m_details[TILE_S][TILE_E] = biome;
   }
 
-}
+  void tile::set_biome(detail where, int biome) {
+    switch (where) {
+      case detail::NW:
+        m_details[TILE_N][TILE_W] = biome;
+        break;
 
+      case detail::NE:
+        m_details[TILE_N][TILE_E] = biome;
+        break;
+
+      case detail::SW:
+        m_details[TILE_S][TILE_W] = biome;
+        break;
+
+      case detail::SE:
+        m_details[TILE_S][TILE_E] = biome;
+        break;
+    }
+  }
+
+}

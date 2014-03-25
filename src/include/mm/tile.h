@@ -39,6 +39,8 @@ namespace mm {
 
     void set_biome(int biome);
 
+    void set_biome(detail where, int biome);
+
   private:
     int m_biome;
     int m_details[2][2];
