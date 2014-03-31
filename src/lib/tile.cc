@@ -22,6 +22,21 @@
 
 namespace mm {
 
+  int tile::biome(detail where) const {
+    switch (where) {
+      case detail::NW:
+        return m_details[TILE_N][TILE_W];
+      case detail::NE:
+        return m_details[TILE_N][TILE_E];
+      case detail::SW:
+        return m_details[TILE_S][TILE_W];
+      case detail::SE:
+        return m_details[TILE_S][TILE_E];
+    }
+
+    return -1;
+  }
+
   void tile::set_biome(int biome) {
     m_biome = biome;
     m_details[TILE_N][TILE_W] = biome;

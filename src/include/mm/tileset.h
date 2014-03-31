@@ -33,6 +33,7 @@ namespace mm {
     bool add_terrain(const biome& biome);
 
     int compute_biome(double altitude, double humidity, bool water) const;
+    bool has_higher_priority(int biome_id, int other_biome_id) const;
 
     color biome_representation(int biome) const;
 

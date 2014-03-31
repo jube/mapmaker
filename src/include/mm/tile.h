@@ -37,6 +37,8 @@ namespace mm {
       return m_biome;
     }
 
+    int biome(detail where) const;
+
     void set_biome(int biome);
 
     void set_biome(detail where, int biome);

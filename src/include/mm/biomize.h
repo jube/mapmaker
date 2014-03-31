@@ -24,9 +24,21 @@ namespace mm {
 
   class biomize {
   public:
-    colormap operator()(const tilemap& src, const tileset& set) const;
-  };
+    enum class kind {
+      SIMPLE,
+      DETAILED
+    };
 
+    biomize(kind k)
+    : m_kind(k)
+    {
+    }
+
+    colormap operator()(const tilemap& src, const tileset& set) const;
+
+  private:
+    kind m_kind;
+  };
 
 }
 

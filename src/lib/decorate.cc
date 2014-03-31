@@ -199,6 +199,47 @@ namespace mm {
     return watermap;
   }
 
+  static int compute_detailed_biome(int biome, int corner, int other_corner, const tileset& set) {
+    if (corner != other_corner) {
+      return biome;
+    }
+
+    if (set.has_higher_priority(biome, corner)) {
+      return biome;
+    }
+
+    return corner;
+  }
+
+  static void compute_detailed_tiles(tilemap& map, const tileset& set) {
+    for (auto x : map.x_range()) {
+      for (auto y : map.y_range()) {
+        int biome = map(x, y).biome();
+
+        if (x > 0 && y > 0) {
+          int detailed_biome = compute_detailed_biome(biome, map(x - 1, y).biome(), map(x, y - 1).biome(), set);
+          map(x, y).set_biome(tile::detail::NW, detailed_biome);
+        }
+
+        if (x < map.height() - 1 && y > 0) {
+          int detailed_biome = compute_detailed_biome(biome, map(x + 1, y).biome(), map(x, y - 1).biome(), set);
+          map(x, y).set_biome(tile::detail::NE, detailed_biome);
+        }
+
+        if (x > 0 && y < map.width() - 1) {
+          int detailed_biome = compute_detailed_biome(biome, map(x - 1, y).biome(), map(x, y + 1).biome(), set);
+          map(x, y).set_biome(tile::detail::SW, detailed_biome);
+        }
+
+        if (x < map.height() - 1 && y < map.width() - 1) {
+          int detailed_biome = compute_detailed_biome(biome, map(x + 1, y).biome(), map(x, y + 1).biome(), set);
+          map(x, y).set_biome(tile::detail::SE, detailed_biome);
+        }
+      }
+    }
+  }
+
+
   tilemap decorate::operator()(const heightmap& src, const tileset& set, random_engine& engine) const {
     binarymap watermap = compute_initial_watermap(src, m_sea_level);
 
@@ -218,6 +259,8 @@ namespace mm {
       int biome = set.compute_biome(value_with_sea_level(src(fp), m_sea_level), humiditymap(fp), watermap(fp));
       map(fp).set_biome(biome);
     }
+
+    compute_detailed_tiles(map, set);
 
     return map;
   }

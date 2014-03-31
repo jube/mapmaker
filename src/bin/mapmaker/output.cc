@@ -107,7 +107,7 @@ namespace mm {
       set.output_to_ppm(tilesetfile);
 
       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
-      auto colored = biomize()(tiled, set);
+      auto colored = biomize(biomize::kind::DETAILED)(tiled, set);
 
 //       colored = shader(sea_level)(colored, map);
 

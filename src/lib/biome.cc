@@ -29,7 +29,19 @@ namespace mm {
     return water == m_water;
   }
 
-  bool biome::intersects(const biome& other) {
+  bool biome::has_higher_priority(const biome& other) const {
+    if (m_water != other.m_water) {
+      return m_water;
+    }
+
+    if (m_altitude_range.min > other.m_altitude_range.min) {
+      return true;
+    }
+
+    if (m_humidity_range.min > other.m_humidity_range.min) {
+      return true;
+    }
+
     return false;
   }
 

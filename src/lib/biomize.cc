@@ -18,12 +18,31 @@
 namespace mm {
 
   colormap biomize::operator()(const tilemap& src, const tileset& set) const {
-    colormap map(size_only, src);
+    colormap::size_type width = src.width();
+    colormap::size_type height = src.height();
 
-    for (tilemap::size_type x = 0; x < src.width(); ++x) {
-      for (tilemap::size_type y = 0; y < src.height(); ++y) {
-        int biome = src(x, y).biome();
-        map(x, y) = set.biome_representation(biome);
+    if (m_kind == kind::DETAILED) {
+      width *= 2;
+      height *= 2;
+    }
+
+    colormap map(width, height);
+
+    for (auto x : src.x_range()) {
+      for (auto y : src.y_range()) {
+        if (m_kind == kind::SIMPLE) {
+          int biome = src(x, y).biome();
+          map(x, y) = set.biome_representation(biome);
+        } else {
+          int biome_nw = src(x, y).biome(tile::detail::NW);
+          map(2*x, 2*y) = set.biome_representation(biome_nw);
+          int biome_ne = src(x, y).biome(tile::detail::NE);
+          map(2*x + 1, 2*y) = set.biome_representation(biome_ne);
+          int biome_sw = src(x, y).biome(tile::detail::SW);
+          map(2*x, 2*y + 1) = set.biome_representation(biome_sw);
+          int biome_se = src(x, y).biome(tile::detail::SE);
+          map(2*x + 1, 2*y + 1) = set.biome_representation(biome_se);
+        }
       }
     }
 

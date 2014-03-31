@@ -44,7 +44,7 @@ namespace mm {
 
     bool match(double altitude, double humidity, bool water) const;
 
-    bool intersects(const biome& other);
+    bool has_higher_priority(const biome& other) const;
 
   private:
     std::string m_name;

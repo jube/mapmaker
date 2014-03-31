@@ -15,6 +15,8 @@
  */
 #include <mm/tileset.h>
 
+#include <cassert>
+
 #include <mm/biomize.h>
 #include <mm/tilemap.h>
 
@@ -33,6 +35,19 @@ namespace mm {
     }
 
     return -1;
+  }
+
+  bool tileset::has_higher_priority(int biome_id, int other_biome_id) const {
+    auto it = m_terrains.find(biome_id);
+    assert(it != m_terrains.end());
+
+    auto it_other = m_terrains.find(other_biome_id);
+    assert(it_other != m_terrains.end());
+
+    auto biome = it->second;
+    auto other_biome = it_other->second;
+
+    return biome.has_higher_priority(other_biome);
   }
 
   color tileset::biome_representation(int biome) const {
@@ -60,7 +75,7 @@ namespace mm {
       }
     }
 
-    auto colored = biomize()(map, *this);
+    auto colored = biomize(biomize::kind::SIMPLE)(map, *this);
     colored.output_to_ppm(file);
   }
 
