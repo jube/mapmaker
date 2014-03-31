@@ -199,7 +199,7 @@ namespace mm {
     return watermap;
   }
 
-  static int compute_detailed_biome(int biome, int corner, int other_corner, const tileset& set) {
+  static int compute_detailed_biome(int biome, int corner, int other_corner, const biomeset& set) {
     if (corner != other_corner) {
       return biome;
     }
@@ -211,7 +211,7 @@ namespace mm {
     return corner;
   }
 
-  static void compute_detailed_tiles(tilemap& map, const tileset& set) {
+  static void compute_detailed_tiles(tilemap& map, const biomeset& set) {
     for (auto x : map.x_range()) {
       for (auto y : map.y_range()) {
         int biome = map(x, y).biome();
@@ -240,7 +240,7 @@ namespace mm {
   }
 
 
-  tilemap decorate::operator()(const heightmap& src, const tileset& set, random_engine& engine) const {
+  tilemap decorate::operator()(const heightmap& src, const biomeset& set, random_engine& engine) const {
     binarymap watermap = compute_initial_watermap(src, m_sea_level);
 
     auto rivers = generate_rivers(src, watermap, m_rivers, m_min_source_altitude, engine);

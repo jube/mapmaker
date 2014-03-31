@@ -19,7 +19,7 @@
 #include <mm/heightmap.h>
 #include <mm/random.h>
 #include <mm/tilemap.h>
-#include <mm/tileset.h>
+#include <mm/biomeset.h>
 
 namespace mm {
 
@@ -32,7 +32,7 @@ namespace mm {
     {
     }
 
-    tilemap operator()(const heightmap& src, const tileset& set, random_engine& engine) const;
+    tilemap operator()(const heightmap& src, const biomeset& set, random_engine& engine) const;
 
   private:
     double m_sea_level;

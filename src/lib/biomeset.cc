@@ -13,7 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/tileset.h>
+#include <mm/biomeset.h>
 
 #include <cassert>
 
@@ -22,12 +22,12 @@
 
 namespace mm {
 
-  bool tileset::add_terrain(const biome& biome) {
+  bool biomeset::add_terrain(const biome& biome) {
     auto ret = m_terrains.emplace(m_terrain_id++, biome);
     return ret.second;
   }
 
-  int tileset::compute_biome(double altitude, double humidity, bool water) const {
+  int biomeset::compute_biome(double altitude, double humidity, bool water) const {
     for (auto value : m_terrains) {
       if (value.second.match(altitude, humidity, water)) {
         return value.first;
@@ -37,7 +37,7 @@ namespace mm {
     return -1;
   }
 
-  bool tileset::has_higher_priority(int biome_id, int other_biome_id) const {
+  bool biomeset::has_higher_priority(int biome_id, int other_biome_id) const {
     auto it = m_terrains.find(biome_id);
     assert(it != m_terrains.end());
 
@@ -50,7 +50,7 @@ namespace mm {
     return biome.has_higher_priority(other_biome);
   }
 
-  color tileset::biome_representation(int biome) const {
+  color biomeset::biome_representation(int biome) const {
     auto ret = m_terrains.find(biome);
 
     if (ret == m_terrains.end()) {
@@ -62,7 +62,7 @@ namespace mm {
 
 #define TILESET_SIZE 256
 
-  void tileset::output_to_ppm(std::ostream& file) const {
+  void biomeset::output_to_ppm(std::ostream& file) const {
     tilemap map(2 * TILESET_SIZE, TILESET_SIZE);
 
     for (tilemap::size_type x = 0; x < TILESET_SIZE; ++x) {
@@ -80,8 +80,8 @@ namespace mm {
   }
 
 
-  tileset tileset::whittaker() {
-    tileset set;
+  biomeset biomeset::whittaker() {
+    biomeset set;
     /*
      * water
      */

@@ -23,7 +23,7 @@
 #include <mm/colorize.h>
 #include <mm/decorate.h>
 #include <mm/tilemap.h>
-#include <mm/tileset.h>
+#include <mm/biomeset.h>
 #include <mm/shader.h>
 
 #include "exception.h"
@@ -100,11 +100,11 @@ namespace mm {
       }
       auto min_source_altitude = min_source_altitude_node.as<double>();
 
-//       tileset set = color_ramp::basic().compute_tileset(sea_level);
-      tileset set = tileset::whittaker();
+//       biomeset set = color_ramp::basic().compute_biomeset(sea_level);
+      biomeset set = biomeset::whittaker();
 
-      std::ofstream tilesetfile("tileset.ppm");
-      set.output_to_ppm(tilesetfile);
+      std::ofstream biomesetfile("biomeset.ppm");
+      set.output_to_ppm(biomesetfile);
 
       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
       auto colored = biomize(biomize::kind::DETAILED)(tiled, set);

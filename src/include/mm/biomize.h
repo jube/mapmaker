@@ -16,9 +16,9 @@
 #ifndef MM_BIOMIZE_H
 #define MM_BIOMIZE_H
 
+#include <mm/biomeset.h>
 #include <mm/colormap.h>
 #include <mm/tilemap.h>
-#include <mm/tileset.h>
 
 namespace mm {
 
@@ -34,7 +34,7 @@ namespace mm {
     {
     }
 
-    colormap operator()(const tilemap& src, const tileset& set) const;
+    colormap operator()(const tilemap& src, const biomeset& set) const;
 
   private:
     kind m_kind;

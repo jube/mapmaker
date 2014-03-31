@@ -13,8 +13,8 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILESET_H
-#define MM_TILESET_H
+#ifndef MM_BIOMESET_H
+#define MM_BIOMESET_H
 
 #include <iosfwd>
 #include <map>
@@ -23,9 +23,9 @@
 
 namespace mm {
 
-  class tileset {
+  class biomeset {
   public:
-    tileset()
+    biomeset()
     : m_terrain_id(0)
     {
     }
@@ -39,7 +39,7 @@ namespace mm {
 
     void output_to_ppm(std::ostream& file) const;
 
-    static tileset whittaker();
+    static biomeset whittaker();
 
   private:
     int m_terrain_id;
@@ -48,4 +48,4 @@ namespace mm {
 
 }
 
-#endif // MM_TILESET_H
+#endif // MM_BIOMESET_H

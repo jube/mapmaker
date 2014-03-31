@@ -17,7 +17,7 @@
 
 namespace mm {
 
-  colormap biomize::operator()(const tilemap& src, const tileset& set) const {
+  colormap biomize::operator()(const tilemap& src, const biomeset& set) const {
     colormap::size_type width = src.width();
     colormap::size_type height = src.height();
 

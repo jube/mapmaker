@@ -72,7 +72,7 @@ namespace mm {
     return lerp(c1, c2, (offset - t1) / (t2 - t1));
   }
 
-  tileset color_ramp::compute_tileset() const {
+  biomeset color_ramp::compute_biomeset() const {
     std::vector<double> limits;
 
     double prev = -1.0;
@@ -90,7 +90,7 @@ namespace mm {
     assert(m_map.size() == limits.size());
     assert(std::is_sorted(limits.begin(), limits.end()));
 
-    tileset set;
+    biomeset set;
     set.add_terrain({ "River", { 19, 149, 255 }, { 0.5, 1 }, { 0, 1 }, true }); // river
 
     prev = 0.0;
