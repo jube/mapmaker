@@ -31,10 +31,12 @@ namespace mm {
     }
 
     bool add_terrain(const biome& biome);
+    int get_next_id() const;
 
     int compute_biome(double altitude, double humidity, bool water) const;
     bool has_higher_priority(int biome_id, int other_biome_id) const;
 
+    const std::string& name(int biome) const;
     color biome_representation(int biome) const;
 
     void output_to_ppm(std::ostream& file) const;

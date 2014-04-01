@@ -38,6 +38,10 @@ namespace mm {
     {
     }
 
+    const std::string& name() const {
+      return m_name;
+    }
+
     color representation() const {
       return m_rep;
     }

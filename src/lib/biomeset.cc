@@ -27,6 +27,10 @@ namespace mm {
     return ret.second;
   }
 
+  int biomeset::get_next_id() const {
+    return m_terrain_id;
+  }
+
   int biomeset::compute_biome(double altitude, double humidity, bool water) const {
     for (auto value : m_terrains) {
       if (value.second.match(altitude, humidity, water)) {
@@ -48,6 +52,18 @@ namespace mm {
     auto other_biome = it_other->second;
 
     return biome.has_higher_priority(other_biome);
+  }
+
+  const std::string& biomeset::name(int biome) const {
+    static const std::string undef = "Undefined";
+
+    auto ret = m_terrains.find(biome);
+
+    if (ret == m_terrains.end()) {
+      return undef;
+    }
+
+    return ret->second.name();
   }
 
   color biomeset::biome_representation(int biome) const {
@@ -85,10 +101,13 @@ namespace mm {
     /*
      * water
      */
+#if 0
     set.add_terrain({ "Ocean",                      { 0x44, 0x44, 0x7A }, { 0, 0.5 }, { 0, 1 }, true });
     set.add_terrain({ "Marsh",                      { 0x2F, 0x66, 0x66 }, { 0.5, 0.55 }, { 0, 1 }, true });
     set.add_terrain({ "Lake",                       { 0x33, 0x66, 0x99 }, { 0.55, 0.9 }, { 0, 1 }, true });
     set.add_terrain({ "Ice",                        { 0x99, 0xFF, 0xFF }, { 0.9, 1 }, { 0, 1 }, true });
+#endif
+    set.add_terrain({ "Lake",                       { 0x33, 0x66, 0x99 }, { 0, 1 }, { 0, 1 }, true });
     /*
      * non-water
      */
