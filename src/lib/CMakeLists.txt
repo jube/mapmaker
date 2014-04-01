@@ -33,7 +33,10 @@ set(LIBMM_SRC
   slope.cc
   smooth.cc
   tile.cc
+  tile_image.cc
   tilemap.cc
+  tileset.cc
+  tilize.cc
   thermal_erosion.cc
   value_noise.cc
 )

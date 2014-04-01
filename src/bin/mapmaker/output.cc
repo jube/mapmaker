@@ -19,11 +19,12 @@
 #include <fstream>
 #include <iostream>
 
+#include <mm/biomeset.h>
 #include <mm/biomize.h>
 #include <mm/colorize.h>
 #include <mm/decorate.h>
 #include <mm/tilemap.h>
-#include <mm/biomeset.h>
+#include <mm/tilize.h>
 #include <mm/shader.h>
 
 #include "exception.h"
@@ -108,6 +109,8 @@ namespace mm {
 
       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
       auto colored = biomize(biomize::kind::DETAILED)(tiled, set);
+
+      tilize()(tiled, set, "map.tmx", "biome.pnm");
 
 //       colored = shader(sea_level)(colored, map);
 
