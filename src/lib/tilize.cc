@@ -22,12 +22,13 @@
 
 #include <mm/tile_image.h>
 #include <mm/tileset.h>
+#include <mm/hull.h>
 
 #define FIRST_GID 1
 
 namespace mm {
 
-  void tilize::operator()(const tilemap& src, const biomeset& set, const std::string& tmx_name, const std::string& img_name) const {
+  void tilize::operator()(const tilemap& src, const biomeset& set, const binarymap& reachable, const std::string& tmx_name, const std::string& img_name) const {
     tileset tiles(FIRST_GID);
 
     // first, add all the uniform tiles
@@ -82,11 +83,12 @@ namespace mm {
 
     tmx_file << "</tileset>\n";
 
+    // tile layer
     tmx_file << "<layer name=\"Ground Floor\" ";
     tmx_file << "width=\"" << src.width() << "\" height=\"" << src.height() << "\">\n";
 
     tmx_file << "<properties>\n";
-    tmx_file << "\t<property name=\"altitude\" value=\"0\"/>\n";
+    tmx_file << "\t<property name=\"kind\" value=\"ground\"/>\n";
     tmx_file << "</properties>\n";
 
     tmx_file << "<data encoding=\"csv\">\n";
@@ -101,6 +103,40 @@ namespace mm {
     tmx_file << "</data>\n";
 
     tmx_file << "</layer>\n";
+
+    // collision layer
+    tmx_file << "<objectgroup color=\"#00c0c0\" name=\"No Trespassing Lines (second basement)\" ";
+    tmx_file << "width=\"" << src.width() << "\" height=\"" << src.height() << "\">\n";
+
+    tmx_file << "<properties>\n";
+    tmx_file << "\t<property name=\"floor\" value=\"0\"/>\n";
+    tmx_file << "\t<property name=\"kind\" value=\"zone\"/>\n";
+    tmx_file << "</properties>\n";
+
+    auto hulls = hull(32)(reachable);
+
+    for (auto hull : hulls) {
+      auto first = hull.front();
+      long x0 = first.x;
+      long y0 = first.y;
+
+      tmx_file << "<object name=\"Limit\" type=\"collision\" ";
+      tmx_file << "x=\"" << x0 << "\" y=\"" << y0 << "\">\n";
+      tmx_file << "<polygon points=";
+      char sep = '"';
+      for (auto point : hull) {
+        long x = point.x;
+        long y = point.y;
+
+        tmx_file << sep << (x - x0) << ',' << (y - y0);
+        sep = ' ';
+      }
+      tmx_file << "\"/>\n";
+      tmx_file << "</object>\n";
+    }
+
+    tmx_file << "</objectgroup>\n";
+
 
     tmx_file << "</map>\n";
 

@@ -13,20 +13,28 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILIZE_H
-#define MM_TILIZE_H
+#ifndef MM_HULL_H
+#define MM_HULL_H
 
-#include <mm/biomeset.h>
-#include <mm/tilemap.h>
+#include <vector>
+
 #include <mm/binarymap.h>
 
 namespace mm {
 
-  class tilize {
+  class hull {
   public:
-    void operator()(const tilemap& src, const biomeset& set, const binarymap& reachable, const std::string& tmx_name, const std::string& img_name) const;
+    hull(std::size_t size)
+    : m_size(size)
+    {
+    }
+
+    std::vector<std::vector<position>> operator()(const binarymap& src) const;
+
+  private:
+    std::size_t m_size;
   };
 
 }
 
-#endif // MM_TILIZE_H
+#endif // MM_HULL_H

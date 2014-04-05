@@ -23,9 +23,11 @@
 #include <mm/biomize.h>
 #include <mm/colorize.h>
 #include <mm/decorate.h>
+#include <mm/playability.h>
+#include <mm/reachability.h>
+#include <mm/shader.h>
 #include <mm/tilemap.h>
 #include <mm/tilize.h>
-#include <mm/shader.h>
 
 #include "exception.h"
 #include "print.h"
@@ -89,6 +91,18 @@ namespace mm {
       }
       auto sea_level = sea_level_node.as<double>();
 
+      auto nu_node = parameters_node["unit_size"];
+      if (!nu_node) {
+        throw bad_structure("mapmaker: missing 'unit_size' in 'tiled' output parameters");
+      }
+      auto nu = nu_node.as<reachability::size_type>();
+
+      auto tu_node = parameters_node["unit_talus"];
+      if (!tu_node) {
+        throw bad_structure("mapmaker: missing 'unit_talus' in 'tiled' output parameters");
+      }
+      auto tu = tu_node.as<double>();
+
       auto rivers_node = parameters_node["rivers"];
       if (!rivers_node) {
         throw bad_structure("mapmaker: missing 'rivers' in 'tiled' output parameters");
@@ -110,7 +124,13 @@ namespace mm {
       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
       auto colored = biomize(biomize::kind::DETAILED)(tiled, set);
 
-      tilize()(tiled, set, "map.tmx", "biome.pnm");
+      auto size_max = std::max(map.width(), map.height());
+      auto size_min = std::min(map.width(), map.height());
+      auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
+
+      binarymap unit_map;
+      std::tie(std::ignore, unit_map, std::ignore) = playability(sea_level, nu, nu, tu / size, tu / size, false)(map);
+      tilize()(tiled, set, unit_map, "map.tmx", "biome.pnm");
 
 //       colored = shader(sea_level)(colored, map);
 

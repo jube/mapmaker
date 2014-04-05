@@ -20,6 +20,7 @@ set(LIBMM_SRC
   gradient_noise.cc
   heightmap.cc
   hills.cc
+  hull.cc
   hydraulic_erosion.cc
   invert.cc
   islandize.cc
