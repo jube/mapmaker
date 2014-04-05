@@ -21,6 +21,7 @@
 #include <mm/cutoff.h>
 #include <mm/erosion_score.h>
 #include <mm/logical_combine.h>
+#include <mm/playability.h>
 #include <mm/ratio.h>
 #include <mm/reachability.h>
 #include <mm/slope.h>
@@ -42,9 +43,9 @@ namespace mm {
       }
     };
 
-    class playability {
+    class display_playability {
     public:
-      playability(double sea_level, reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus, bool output_intermediates)
+      display_playability(double sea_level, reachability::size_type unit_size, reachability::size_type building_size, double unit_talus, double building_talus, bool output_intermediates)
       : m_sea_level(sea_level)
       , m_unit_size(unit_size)
       , m_building_size(building_size)
@@ -60,55 +61,18 @@ namespace mm {
         print_indent();
         std::printf("\terosion score: " BEGIN_VALUE "%f" END_VALUE "\n", erosion);
 
-        auto island_map = cutoff(m_sea_level)(map);
+        binarymap island_map, unit_map, building_map;
+
+        std::tie(island_map, unit_map, building_map) = playability(m_sea_level, m_unit_size, m_building_size, m_unit_talus, m_building_talus, m_output_intermediates)(map);
+
         auto island_ratio = 1.0 - ratio()(island_map);
 
-        auto slope_map = slope()(map);
-
-        // unit_score
-        auto unit_map = cutoff(m_unit_talus)(slope_map);
-        unit_map = logical_combine()(unit_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
-
-        if (m_output_intermediates) {
-          unit_map.output_to_pbm("unit1.pnm");
-        }
-
-        unit_map = reachability(m_unit_size)(unit_map);
-
-        if (m_output_intermediates) {
-          unit_map.output_to_pbm("unit2.pnm");
-        }
-
-        unit_map = accessibility()(unit_map);
-
-        if (m_output_intermediates) {
-          unit_map.output_to_pbm("unit3.pnm");
-        }
-
+        // unit score
         auto unit_score = ratio()(unit_map) / island_ratio;
         print_indent();
         std::printf("\tunit score: " BEGIN_VALUE "%f" END_VALUE "\n", unit_score);
 
         // building score
-        auto building_map = cutoff(m_building_talus)(slope_map);
-        building_map = logical_combine()(building_map, island_map, [](bool lhs, bool rhs) { return lhs & !rhs; });
-
-        if (m_output_intermediates) {
-          building_map.output_to_pbm("building1.pnm");
-        }
-
-        building_map = reachability(m_building_size)(building_map);
-
-        if (m_output_intermediates) {
-          building_map.output_to_pbm("building2.pnm");
-        }
-
-        building_map = logical_combine()(building_map, unit_map, std::logical_and<bool>());
-
-        if (m_output_intermediates) {
-          building_map.output_to_pbm("building3.pnm");
-        }
-
         auto building_score = ratio()(building_map) / island_ratio;
         print_indent();
         std::printf("\tbuilding score: " BEGIN_VALUE "%f" END_VALUE "\n", building_score);
@@ -178,7 +142,7 @@ namespace mm {
     }
     auto output_intermediates = output_intermediates_node.as<bool>();
 
-    return playability(sea_level, nu, nb, tu / size, tb / size, output_intermediates);
+    return display_playability(sea_level, nu, nb, tu / size, tb / size, output_intermediates);
   }
 
   /*

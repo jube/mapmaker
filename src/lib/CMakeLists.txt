@@ -26,6 +26,7 @@ set(LIBMM_SRC
   logical_combine.cc
   midpoint_displacement.cc
   normalize.cc
+  playability.cc
   ratio.cc
   reachability.cc
   shader.cc
