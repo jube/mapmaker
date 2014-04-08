@@ -65,7 +65,27 @@ namespace mm {
   }
 
   heightmap heightmap::input_from_pgm(std::istream& file) {
-    heightmap map;
+    std::string header;
+    file >> header;
+    assert(header == "P2");
+
+    size_type width, height;
+    file >> width >> height;
+
+    unsigned white;
+    file >> white;
+
+    heightmap map(width, height);
+
+    for (size_type y = 0; y < height; ++y) {
+      for (size_type x = 0; x < width; ++x) {
+        unsigned value;
+        file >> value;
+        assert(0 <= value && value <= white);
+
+        map(x, y) = static_cast<double>(value) / white;
+      }
+    }
 
     return map;
   }
