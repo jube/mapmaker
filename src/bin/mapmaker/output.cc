@@ -16,8 +16,6 @@
 #include "output.h"
 
 #include <cassert>
-#include <fstream>
-#include <iostream>
 
 #include <mm/biomeset.h>
 #include <mm/biomize.h>
@@ -50,8 +48,6 @@ namespace mm {
     print_indent();
     std::printf("\toutput: '" BEGIN_FILE "%s" END_FILE "'\n", filename.c_str());
 
-    std::ofstream file(filename);
-
     if (type == "colored") {
       auto parameters_node = node["parameters"];
       if (!parameters_node) {
@@ -77,7 +73,7 @@ namespace mm {
         colored = shader(sea_level)(colored, map);
       }
 
-      colored.output_to_ppm(file);
+      colored.output_to_ppm(filename);
 
     } else if (type == "tiled") {
       auto parameters_node = node["parameters"];
@@ -118,8 +114,7 @@ namespace mm {
 //       biomeset set = color_ramp::basic().compute_biomeset(sea_level);
       biomeset set = biomeset::whittaker();
 
-      std::ofstream biomesetfile("biomeset.ppm");
-      set.output_to_ppm(biomesetfile);
+      set.output_to_ppm("biomeset.ppm");
 
       auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
       auto colored = biomize(biomize::kind::DETAILED)(tiled, set);
@@ -134,10 +129,10 @@ namespace mm {
 
 //       colored = shader(sea_level)(colored, map);
 
-      colored.output_to_ppm(file);
+      colored.output_to_ppm(filename);
 
     } else if (type == "grayscale") {
-      map.output_to_pgm(file);
+      map.output_to_pgm(filename);
     } else {
       std::printf("Warning! Unknown output type: '%s'. No output generated.\n", type.c_str());
     }

@@ -40,6 +40,7 @@ namespace mm {
     color biome_representation(int biome) const;
 
     void output_to_ppm(std::ostream& file) const;
+    void output_to_ppm(const std::string& filename) const;
 
     static biomeset whittaker();
 

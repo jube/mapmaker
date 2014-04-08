@@ -16,6 +16,7 @@
 #include <mm/biomeset.h>
 
 #include <cassert>
+#include <fstream>
 
 #include <mm/biomize.h>
 #include <mm/tilemap.h>
@@ -93,6 +94,11 @@ namespace mm {
 
     auto colored = biomize(biomize::kind::SIMPLE)(map, *this);
     colored.output_to_ppm(file);
+  }
+
+  void biomeset::output_to_ppm(const std::string& filename) const {
+    std::ofstream file(filename);
+    return output_to_ppm(file);
   }
 
 
