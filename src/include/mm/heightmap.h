@@ -87,6 +87,9 @@ namespace mm {
 
     void output_to_pgm(std::ostream& file) const;
     void output_to_pgm(const std::string& filename) const;
+
+    static heightmap input_from_pgm(std::istream& file);
+    static heightmap input_from_pgm(const std::string& filename);
   };
 
 }

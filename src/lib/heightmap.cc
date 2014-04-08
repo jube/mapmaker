@@ -64,4 +64,16 @@ namespace mm {
     output_to_pgm(file);
   }
 
+  heightmap heightmap::input_from_pgm(std::istream& file) {
+    heightmap map;
+
+    return map;
+  }
+
+
+  heightmap heightmap::input_from_pgm(const std::string& filename) {
+    std::ifstream file(filename);
+    return input_from_pgm(file);
+  }
+
 }
