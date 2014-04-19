@@ -30,7 +30,7 @@ namespace mm {
     {
     }
 
-    bool add_terrain(const biome& biome);
+    biome& add_terrain(const biome& biome);
     int get_next_id() const;
 
     int compute_biome(double altitude, double humidity, bool water) const;

@@ -91,7 +91,7 @@ namespace mm {
     assert(std::is_sorted(limits.begin(), limits.end()));
 
     biomeset set;
-    set.add_terrain({ "River", { 19, 149, 255 }, { 0.5, 1 }, { 0, 1 }, true }); // river
+    set.add_terrain({ "River", { 19, 149, 255 }}).add_climate({ 0.5, 1 }, { 0, 1 }, true); // river
 
     prev = 0.0;
     std::size_t index = 0;
@@ -101,10 +101,12 @@ namespace mm {
       double curr = limits[index];
 
       if (prev < 0.5 && 0.5 < curr) {
-        set.add_terrain({ name, value.second, { prev, 0.5 }, { 0, 1 }, true });
-        set.add_terrain({ name, value.second, { 0.5, curr }, { 0, 1 }, false });
+        set.add_terrain({ name, value.second })
+            .add_climate({ prev, 0.5 }, { 0, 1 }, true)
+            .add_climate({ 0.5, curr }, { 0, 1 }, false);
       } else {
-        set.add_terrain({ name, value.second, { prev, curr }, { 0, 1 }, curr < 0.5 });
+        set.add_terrain({ name, value.second })
+            .add_climate({ prev, curr }, { 0, 1 }, (curr < 0.5));
       }
 
       prev = curr;

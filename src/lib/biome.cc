@@ -17,30 +17,45 @@
 
 namespace mm {
 
+  biome& biome::add_climate(range altitude_range, range humidity_range, bool water) {
+    m_climates.emplace_back(climate{altitude_range, humidity_range, water});
+    return *this;
+  }
+
+  static bool climate_match(const climate& c, double  altitude, double humidity, bool water) {
+    if (altitude < c.altitude.min || c.altitude.max < altitude) {
+      return false;
+    }
+
+    if (humidity < c.humidity.min || c.humidity.max < humidity) {
+      return false;
+    }
+
+    return water == c.water;
+  }
+
   bool biome::match(double altitude, double humidity, bool water) const {
-    if (altitude < m_altitude_range.min || m_altitude_range.max < altitude) {
-      return false;
+    for (auto climate : m_climates) {
+      if (climate_match(climate, altitude, humidity, water)) {
+        return true;
+      }
     }
 
-    if (humidity < m_humidity_range.min || m_humidity_range.max < humidity) {
-      return false;
-    }
-
-    return water == m_water;
+    return false;
   }
 
   bool biome::has_higher_priority(const biome& other) const {
-    if (m_water != other.m_water) {
-      return m_water;
-    }
-
-    if (m_altitude_range.min > other.m_altitude_range.min) {
-      return true;
-    }
-
-    if (m_humidity_range.min > other.m_humidity_range.min) {
-      return true;
-    }
+//     if (m_water != other.m_water) {
+//       return m_water;
+//     }
+//
+//     if (m_altitude_range.min > other.m_altitude_range.min) {
+//       return true;
+//     }
+//
+//     if (m_humidity_range.min > other.m_humidity_range.min) {
+//       return true;
+//     }
 
     return false;
   }
