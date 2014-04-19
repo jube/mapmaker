@@ -113,23 +113,25 @@ namespace mm {
     set.add_terrain({ "Lake",                       { 0x33, 0x66, 0x99 }, { 0.55, 0.9 }, { 0, 1 }, true });
     set.add_terrain({ "Ice",                        { 0x99, 0xFF, 0xFF }, { 0.9, 1 }, { 0, 1 }, true });
 #endif
-    set.add_terrain({ "Lake",                       { 0x33, 0x66, 0x99 }}).add_climate({ 0, 1 }, { 0, 1 }, true);
+    set.add_terrain({ "Water",                       { 0x33, 0x66, 0x99 }}).add_climate({ 0, 1 }, { 0, 1 }, true);
     /*
      * non-water
      */
     set.add_terrain({ "Beach",                      { 0xA0, 0x90, 0x77 }}).add_climate({ 0.5, 0.52 }, { 0, 1 }, false);
     // low altitudes
     set.add_terrain({ "Subtropical Desert",         { 0xD2, 0xB9, 0x8B }}).add_climate({ 0.52, 0.65 }, { 0, 0.16 }, false);
-    set.add_terrain({ "Grassland",                  { 0x88, 0xAA, 0x55 }}).add_climate({ 0.52, 0.65 }, { 0.16, 0.33 }, false);
+    set.add_terrain({ "Grassland",                  { 0x88, 0xAA, 0x55 }})
+        .add_climate({ 0.52, 0.65 }, { 0.16, 0.33 }, false)
+        .add_climate({ 0.65, 0.8 }, { 0.16, 0.5 }, false);
     set.add_terrain({ "Tropical Seasonal Forest",   { 0x55, 0x99, 0x44 }}).add_climate({ 0.52, 0.65 }, { 0.33, 0.66 }, false);
     set.add_terrain({ "Tropical Rain Forest",       { 0x33, 0x77, 0x55 }}).add_climate({ 0.52, 0.65 }, { 0.66, 1 }, false);
     // mid altitudes
-    set.add_terrain({ "Temperate Desert",           { 0xC9, 0xD2, 0x9B }}).add_climate({ 0.65, 0.8 }, { 0, 0.16 }, false);
-    set.add_terrain({ "Grassland",                  { 0x88, 0xAA, 0x55 }}).add_climate({ 0.65, 0.8 }, { 0.16, 0.5 }, false);
+    set.add_terrain({ "Temperate Desert",           { 0xC9, 0xD2, 0x9B }})
+        .add_climate({ 0.65, 0.8 }, { 0, 0.16 }, false)
+        .add_climate({ 0.8, 0.9 }, { 0, 0.33 }, false);
     set.add_terrain({ "Temperate Deciduous Forest", { 0x67, 0x94, 0x59 }}).add_climate({ 0.65, 0.8 }, { 0.5, 0.83 }, false);
     set.add_terrain({ "Temperate Rain Forest",      { 0x44, 0x88, 0x55 }}).add_climate({ 0.65, 0.8 }, { 0.83, 1 }, false);
     // high altitudes
-    set.add_terrain({ "Temperate Desert",           { 0xC9, 0xD2, 0x9B }}).add_climate({ 0.8, 0.9 }, { 0, 0.33 }, false);
     set.add_terrain({ "Shrubland",                  { 0x88, 0x99, 0x77 }}).add_climate({ 0.8, 0.9 }, { 0.33, 0.66 }, false);
     set.add_terrain({ "Taiga",                      { 0x99, 0xAA, 0x77 }}).add_climate({ 0.8, 0.9 }, { 0.66, 1 }, false);
     // very high altitudes
