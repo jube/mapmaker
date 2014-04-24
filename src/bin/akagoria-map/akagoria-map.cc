@@ -23,6 +23,7 @@
 
 #include <mm/color.h>
 #include <mm/heightmap.h>
+#include <mm/playability.h>
 #include <mm/random.h>
 #include <mm/reachability.h>
 #include <mm/utils.h>
@@ -235,6 +236,126 @@ namespace {
   private:
     int m_terrain_id;
     std::map<int, biome> m_terrains;
+  };
+
+  /*
+   * tiles
+   */
+
+#define TILE_N 0
+#define TILE_S 1
+#define TILE_W 0
+#define TILE_E 1
+
+  class tile {
+  public:
+
+    enum class detail {
+      NW,
+      NE,
+      SW,
+      SE,
+    };
+
+    int biome(detail where) const {
+      switch (where) {
+        case detail::NW:
+          return m_details[TILE_N][TILE_W];
+        case detail::NE:
+          return m_details[TILE_N][TILE_E];
+        case detail::SW:
+          return m_details[TILE_S][TILE_W];
+        case detail::SE:
+          return m_details[TILE_S][TILE_E];
+      }
+
+      return -1;
+    }
+
+    void set_biome(detail where, int biome) {
+      switch (where) {
+        case detail::NW:
+          m_details[TILE_N][TILE_W] = biome;
+          break;
+
+        case detail::NE:
+          m_details[TILE_N][TILE_E] = biome;
+          break;
+
+        case detail::SW:
+          m_details[TILE_S][TILE_W] = biome;
+          break;
+
+        case detail::SE:
+          m_details[TILE_S][TILE_E] = biome;
+          break;
+      }
+    }
+
+  private:
+    int m_details[2][2] = { { -1, -1 }, { -1, -1 } };
+  };
+
+  class tilemap : public mm::planemap<tile> {
+  public:
+    typedef typename mm::planemap<tile>::value_type value_type;
+    typedef typename mm::planemap<tile>::allocator_type allocator_type;
+    typedef typename mm::planemap<tile>::size_type size_type;
+    typedef typename mm::planemap<tile>::difference_type difference_type;
+    typedef typename mm::planemap<tile>::reference reference;
+    typedef typename mm::planemap<tile>::const_reference const_reference;
+    typedef typename mm::planemap<tile>::pointer pointer;
+    typedef typename mm::planemap<tile>::const_pointer const_pointer;
+
+    tilemap()
+    {
+    }
+
+    tilemap(size_type w, size_type h)
+    : mm::planemap<tile>(w, h)
+    {
+    }
+
+    tilemap(size_type w, size_type h, tile value)
+    : mm::planemap<tile>(w, h, value)
+    {
+    }
+
+    tilemap(const tilemap& other)
+    : mm::planemap<tile>(other)
+    {
+    }
+
+    template<typename T>
+    tilemap(mm::size_only_t, const mm::planemap<T>& other)
+    : tilemap(other.width(), other.height())
+    {
+    }
+
+    tilemap(tilemap&& other)
+    : mm::planemap<tile>(other)
+    {
+    }
+
+    tilemap& operator=(const tilemap& other) {
+      if (this == &other) {
+        return *this;
+      }
+
+      mm::planemap<tile>::operator=(other);
+      return *this;
+    }
+
+    tilemap& operator=(tilemap&& other) {
+      if (this == &other) {
+        return *this;
+      }
+
+      mm::planemap<tile>::operator=(other);
+      return *this;
+    }
+
+    // specialized methods
   };
 
   /*
@@ -504,6 +625,17 @@ void generate_akagoria_map(YAML::Node node) {
     biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
   }
 
+  // tilemap
+
+
+  // unit_map
+  mm::heightmap::size_type size_max, size_min;
+  std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
+  auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
+
+  mm::binarymap unit_map;
+  std::tie(std::ignore, unit_map, std::ignore) =
+      mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
 
 
 
