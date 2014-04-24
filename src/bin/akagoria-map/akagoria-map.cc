@@ -22,6 +22,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <mm/color.h>
+#include <mm/colormap.h>
 #include <mm/heightmap.h>
 #include <mm/playability.h>
 #include <mm/random.h>
@@ -157,6 +158,16 @@ namespace {
       }
 
       return ret->second.representation();
+    }
+
+    std::map<int, std::string> terrains() const {
+      std::map<int, std::string> all_terrains;
+
+      for (auto terrain : m_terrains) {
+        all_terrains.emplace(terrain.first, terrain.second.name());
+      }
+
+      return all_terrains;
     }
 
 #define TILESET_SIZE 256
@@ -633,6 +644,7 @@ static mm::binarymap compute_initial_watermap(const mm::heightmap& src, double s
 /*
  * tiles
  */
+
 static tilemap compute_tilemap(const mm::planemap<int>& biomemap) {
   assert(biomemap.width() > 2);
   assert(biomemap.height() > 2);
@@ -649,6 +661,79 @@ static tilemap compute_tilemap(const mm::planemap<int>& biomemap) {
       map(x, y).set_biome(tile::detail::SW, biomemap(x,     y + 1));
       map(x, y).set_biome(tile::detail::SE, biomemap(x + 1, y + 1));
     }
+  }
+
+  return map;
+}
+
+#define TILE_SIZE 32
+#define EXT_TILE_SIZE (TILE_SIZE + 2)
+
+mm::colormap compute_tileset_image(const tileset& tiles, const biomeset& set) {
+  std::size_t tiles_count = tiles.size();
+
+  std::size_t dim = 1;
+
+  while (dim * dim < tiles_count) {
+    dim += 1;
+  }
+
+  std::size_t size = dim * EXT_TILE_SIZE;
+  mm::colormap map(size, size);
+
+  std::size_t idx = 0;
+
+  for (auto value : tiles) {
+    std::size_t i = idx % dim;
+    std::size_t x0 = i * EXT_TILE_SIZE;
+    std::size_t x2 = x0 + EXT_TILE_SIZE;
+    std::size_t x1 = x0 + (x2 - x0) / 2;
+
+    std::size_t j = idx / dim;
+    std::size_t y0 = j * EXT_TILE_SIZE;
+    std::size_t y2 = y0 + EXT_TILE_SIZE;
+    std::size_t y1 = y0 + (y2 - y0) / 2;
+
+    auto tile = value.second;
+
+    {
+      int biome = tile.biome(tile::detail::NW);
+      auto rep = set.biome_representation(biome);
+      for (auto x = x0; x < x1; x++) {
+        for (auto y = y0; y < y1; y++) {
+          map(x, y) = rep;
+        }
+      }
+    }
+    {
+      int biome = tile.biome(tile::detail::NE);
+      auto rep = set.biome_representation(biome);
+      for (auto x = x1; x < x2; x++) {
+        for (auto y = y0; y < y1; y++) {
+          map(x, y) = rep;
+        }
+      }
+    }
+    {
+      int biome = tile.biome(tile::detail::SW);
+      auto rep = set.biome_representation(biome);
+      for (auto x = x0; x < x1; x++) {
+        for (auto y = y1; y < y2; y++) {
+          map(x, y) = rep;
+        }
+      }
+    }
+    {
+      int biome = tile.biome(tile::detail::SE);
+      auto rep = set.biome_representation(biome);
+      for (auto x = x1; x < x2; x++) {
+        for (auto y = y1; y < y2; y++) {
+          map(x, y) = rep;
+        }
+      }
+    }
+
+    idx++;
   }
 
   return map;
@@ -742,6 +827,26 @@ void generate_akagoria_map(YAML::Node node) {
   // tilemap
   auto tilemap = compute_tilemap(biomemap);
 
+  // tileset
+#define FIRST_GID 1
+
+  auto terrains = set.terrains();
+
+  tileset tiles(FIRST_GID);
+  for (auto terrain : terrains) {
+    tiles.compute_biome_id(terrain.first);
+  }
+
+  std::vector<int> gids;
+  for (auto fp : tilemap.positions()) {
+    int gid = tiles.compute_id(tilemap(fp));
+    assert(gid > 0);
+    gids.push_back(gid);
+  }
+
+  auto img = compute_tileset_image(tiles, set);
+  img.output_to_ppm("biome.pnm");
+
   // unit_map
   mm::heightmap::size_type size_max, size_min;
   std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
@@ -750,6 +855,7 @@ void generate_akagoria_map(YAML::Node node) {
   mm::binarymap unit_map;
   std::tie(std::ignore, unit_map, std::ignore) =
       mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
+
 
 
 
