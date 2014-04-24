@@ -16,6 +16,7 @@
 #include <cinttypes>
 #include <cstdio>
 #include <exception>
+#include <fstream>
 #include <queue>
 #include <stdexcept>
 
@@ -24,6 +25,7 @@
 #include <mm/color.h>
 #include <mm/colormap.h>
 #include <mm/heightmap.h>
+#include <mm/hull.h>
 #include <mm/playability.h>
 #include <mm/random.h>
 #include <mm/reachability.h>
@@ -745,7 +747,7 @@ public:
 };
 
 
-void generate_akagoria_map(YAML::Node node) {
+void generate_akagoria_map(YAML::Node node, std::string filename, std::string imgname) {
   /*
    * get parameters
    */
@@ -845,9 +847,9 @@ void generate_akagoria_map(YAML::Node node) {
   }
 
   auto img = compute_tileset_image(tiles, set);
-  img.output_to_ppm("biome.pnm");
+  img.output_to_ppm(imgname);
 
-  // unit_map
+  // unit map
   mm::heightmap::size_type size_max, size_min;
   std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
   auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
@@ -856,7 +858,95 @@ void generate_akagoria_map(YAML::Node node) {
   std::tie(std::ignore, unit_map, std::ignore) =
       mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
 
+  // tmx file
+  std::ofstream file(filename);
+  file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+  file << "<map version=\"1.0\" orientation=\"orthogonal\" ";
+  file << "width=\"" << tilemap.width() << "\" height=\"" << tilemap.height() << "\" ";
+  file << "tilewidth=\"" << TILE_SIZE << "\" tileheight=\"" << TILE_SIZE << "\">\n";
 
+  file << "<tileset firstgid=\"1\" name=\"Biomes\" ";
+  file << "tilewidth=\"" << TILE_SIZE << "\" tileheight=\"" << TILE_SIZE << "\" spacing=\"2\" margin=\"1\">\n";
+
+  file << "<image source=\"" << imgname << "\" width=\"" << img.width() << "\" height=\"" << img.height() << "\"/>\n";
+  file << "<terraintypes>\n";
+
+  for (auto terrain : terrains) {
+    int id = tiles.compute_biome_id(terrain.first);
+    file << "\t<terrain name=\"" << terrain.second << "\" tile=\"" << (id - FIRST_GID) << "\" />\n";
+  }
+
+  file << "</terraintypes>\n";
+
+  for (auto value : tiles) {
+    file << "<tile id=\"" << value.first << "\" terrain=";
+    char sep = '"';
+    for (auto where : { tile::detail::NW, tile::detail::NE, tile::detail::SW, tile::detail::SE }) {
+      int biome = value.second.biome(where);
+      int id = tiles.compute_biome_id(biome);
+      file << sep << (id - FIRST_GID);
+      sep = ',';
+    }
+    file << "\" />\n";
+  }
+
+  file << "</tileset>\n";
+
+  // tile layer
+  file << "<layer name=\"Ground Floor\" ";
+  file << "width=\"" << tilemap.width() << "\" height=\"" << tilemap.height() << "\">\n";
+
+  file << "<properties>\n";
+  file << "\t<property name=\"kind\" value=\"ground\"/>\n";
+  file << "</properties>\n";
+
+  file << "<data encoding=\"csv\">\n";
+  char sep = ' ';
+  for (auto y : tilemap.y_range()) {
+    for (auto x : tilemap.x_range()) {
+      int gid = tiles.compute_id(tilemap(x, y));
+      file << sep << gid;
+      sep = ',';
+    }
+  }
+  file << "</data>\n";
+
+  file << "</layer>\n";
+
+  // collision layer
+  file << "<objectgroup color=\"#00c0c0\" name=\"No Trespassing Lines\" ";
+  file << "width=\"" << tilemap.width() << "\" height=\"" << tilemap.height() << "\">\n";
+
+  file << "<properties>\n";
+  file << "\t<property name=\"floor\" value=\"0\"/>\n";
+  file << "\t<property name=\"kind\" value=\"zone\"/>\n";
+  file << "</properties>\n";
+
+  auto hulls = mm::hull()(unit_map);
+
+  for (auto hull : hulls) {
+    auto first = hull.front();
+    long x0 = first.x * TILE_SIZE - (TILE_SIZE / 2);
+    long y0 = first.y * TILE_SIZE - (TILE_SIZE / 2);
+
+    file << "<object name=\"Limit\" type=\"collision\" ";
+    file << "x=\"" << x0 << "\" y=\"" << y0 << "\">\n";
+    file << "<polygon points=";
+    char sep = '"';
+    for (auto point : hull) {
+      long x = point.x * TILE_SIZE - (TILE_SIZE / 2);
+      long y = point.y * TILE_SIZE - (TILE_SIZE / 2);
+
+      file << sep << (x - x0) << ',' << (y - y0);
+      sep = ' ';
+    }
+    file << "\"/>\n";
+    file << "</object>\n";
+  }
+
+  file << "</objectgroup>\n";
+
+  file << "</map>\n";
 
 
 }
@@ -873,7 +963,7 @@ int main(int argc, char *argv[]) {
 
   try {
     YAML::Node node = YAML::LoadFile(argv[1]);
-    generate_akagoria_map(node);
+    generate_akagoria_map(node, "map.tmx", "biome.pnm");
 
   } catch (std::exception& ex) {
     std::printf("Error: %s\n", ex.what());

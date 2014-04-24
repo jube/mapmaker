@@ -85,10 +85,10 @@ namespace mm {
           continue;
         }
 
-        position nw{x * m_size, y * m_size};
-        position ne{(x + 1) * m_size, y * m_size};
-        position sw{x * m_size, (y + 1) * m_size};
-        position se{(x + 1) * m_size, (y + 1) * m_size};
+        position nw{x, y};
+        position ne{(x + 1), y};
+        position sw{x, (y + 1)};
+        position se{(x + 1), (y + 1)};
 
         edges.emplace_back(std::make_pair(nw, ne));
         edges.emplace_back(std::make_pair(ne, se));

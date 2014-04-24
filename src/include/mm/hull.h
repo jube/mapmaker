@@ -24,15 +24,7 @@ namespace mm {
 
   class hull {
   public:
-    hull(std::size_t size)
-    : m_size(size)
-    {
-    }
-
     std::vector<std::vector<position>> operator()(const binarymap& src) const;
-
-  private:
-    std::size_t m_size;
   };
 
 }
