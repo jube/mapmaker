@@ -538,7 +538,29 @@ static mm::binarymap compute_initial_watermap(const mm::heightmap& src, double s
   return watermap;
 }
 
+/*
+ * tiles
+ */
+static tilemap compute_tilemap(const mm::planemap<int>& biomemap) {
+  assert(biomemap.width() > 2);
+  assert(biomemap.height() > 2);
 
+  tilemap::size_type width = biomemap.width() - 1;
+  tilemap::size_type height = biomemap.height() - 1;
+
+  tilemap map(width, height);
+
+  for (auto x : map.x_range()) {
+    for (auto y : map.y_range()) {
+      map(x, y).set_biome(tile::detail::NW, biomemap(x,     y));
+      map(x, y).set_biome(tile::detail::NE, biomemap(x + 1, y));
+      map(x, y).set_biome(tile::detail::SW, biomemap(x,     y + 1));
+      map(x, y).set_biome(tile::detail::SE, biomemap(x + 1, y + 1));
+    }
+  }
+
+  return map;
+}
 
 class bad_structure : public std::runtime_error {
 public:
@@ -626,7 +648,7 @@ void generate_akagoria_map(YAML::Node node) {
   }
 
   // tilemap
-
+  auto tilemap = compute_tilemap(biomemap);
 
   // unit_map
   mm::heightmap::size_type size_max, size_min;
