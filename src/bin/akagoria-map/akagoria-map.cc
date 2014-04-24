@@ -16,6 +16,7 @@
 #include <cinttypes>
 #include <cstdio>
 #include <exception>
+#include <queue>
 #include <stdexcept>
 
 #include <yaml-cpp/yaml.h>
@@ -23,6 +24,8 @@
 #include <mm/color.h>
 #include <mm/heightmap.h>
 #include <mm/random.h>
+#include <mm/reachability.h>
+#include <mm/utils.h>
 
 namespace {
 
@@ -234,7 +237,184 @@ namespace {
     std::map<int, biome> m_terrains;
   };
 
+  /*
+   * misc
+   */
 
+  class altitude_compare {
+  public:
+    typedef mm::position value_type;
+
+    altitude_compare(const mm::heightmap& map)
+    : m_map(map)
+    {
+    }
+
+    bool operator()(const mm::position& lhs, const mm::position& rhs) {
+      return m_map(lhs) > m_map(rhs);
+    }
+
+  private:
+    const mm::heightmap& m_map;
+  };
+
+  enum class type {
+    SEA,
+    RIVER,
+    BANK,
+    GROUND,
+  };
+}
+
+
+/*
+ * rivers
+ */
+
+static const int directions[8][2] = {
+  //
+  {  1,  1 },
+  {  1, -1 },
+  {  1,  1 },
+  { -1,  1 },
+  //
+  {  0,  1 },
+  {  0, -1 },
+  {  1,  0 },
+  { -1,  0 },
+};
+
+static std::vector<mm::position> generate_river(const mm::heightmap& map, const mm::binarymap& watermap, const mm::position& source) {
+  mm::planemap<type> typemap(mm::size_only, watermap);
+
+  for (auto fp : watermap.positions()) {
+    if (watermap(fp)) {
+      typemap(fp) = type::SEA;
+    } else {
+      typemap(fp) = type::GROUND;
+    }
+  }
+
+  altitude_compare compare(map);
+  std::priority_queue<mm::position, std::vector<mm::position>, altitude_compare> queue(compare);
+  queue.push(source);
+
+  std::vector<mm::position> river;
+
+  mm::position current = source;
+  while (typemap(current) != type::SEA) {
+    queue.pop();
+    river.push_back(current);
+
+    typemap(current) = type::RIVER;
+
+    for (int k = 0; k < 8; ++k) {
+      int i = directions[k][0];
+      int j = directions[k][1];
+
+      if (current.x == 0 && i == -1) {
+        continue;
+      }
+
+      if (current.x == map.width() - 1 && i == 1) {
+        continue;
+      }
+
+      if (current.y == 0 && j == -1) {
+        continue;
+      }
+
+      if (current.y == map.height() - 1 && j == 1) {
+        continue;
+      }
+
+      mm::position next{ current.x + i, current.y +j };
+
+      if (typemap(next) == type::GROUND) {
+        typemap(next) = type::BANK;
+        queue.push(next);
+      } else if (typemap(next) == type::SEA) {
+        queue.push(next);
+      }
+    }
+
+    current = queue.top();
+  }
+
+  return river;
+}
+
+static std::vector<std::vector<mm::position>> generate_rivers(const mm::heightmap& map, const mm::binarymap& watermap, unsigned rivers_count, double rivers_min_source_altitude, mm::random_engine& engine) {
+  std::uniform_int_distribution<mm::heightmap::size_type> dist_x(0, map.width() - 1);
+  std::uniform_int_distribution<mm::heightmap::size_type> dist_y(0, map.height() - 1);
+
+  std::vector<std::vector<mm::position>> rivers;
+
+  for (unsigned i = 0; i < rivers_count; ++i) {
+    mm::heightmap::size_type x, y;
+
+    do {
+      x = dist_x(engine);
+      y = dist_y(engine);
+    } while (map(x, y) < rivers_min_source_altitude);
+
+    auto river = generate_river(map, watermap, {x, y});
+    rivers.push_back(std::move(river));
+  }
+
+  return rivers;
+}
+
+/*
+ * humidity
+ */
+
+static mm::heightmap compute_humiditymap(const mm::binarymap& watermap) {
+  mm::heightmap humiditymap(mm::size_only, watermap);
+
+  std::queue<mm::position> queue;
+
+  for(auto x : watermap.x_range()) {
+    for(auto y : watermap.y_range()) {
+      if (watermap(x, y)) {
+        humiditymap(x, y) = 0.9;
+        queue.push({ x, y });
+      }
+    }
+  }
+
+  mm::binarymap computed(watermap);
+
+  while (!queue.empty()) {
+    auto here = queue.front();
+    assert(computed(here));
+
+    double humidity_here = humiditymap(here);
+
+    humiditymap.visit8neighbours(here, [humidity_here, &computed, &queue](mm::position there, double& humidity_there) {
+      if (computed(there)) {
+        return;
+      }
+
+      humidity_there = std::pow(humidity_here, 1.05);
+      computed(there) = true;
+      queue.push(there);
+    });
+
+    queue.pop();
+  }
+
+  return humiditymap;
+}
+
+static mm::binarymap compute_initial_watermap(const mm::heightmap& src, double sea_level) {
+  mm::binarymap watermap(mm::size_only, src);
+
+  for (auto fp : src.positions()) {
+    watermap(fp) = (src(fp) < sea_level);
+  }
+
+  return watermap;
 }
 
 
@@ -246,6 +426,9 @@ public:
 
 
 void generate_akagoria_map(YAML::Node node) {
+  /*
+   * get parameters
+   */
   mm::random_engine::result_type seed = 0;
 
   auto seed_node = node["seed"];
@@ -256,14 +439,72 @@ void generate_akagoria_map(YAML::Node node) {
     seed = dev();
     std::printf("Using 'random_device' for seed: %" PRIuFAST64 "\n", seed);
   }
-
   mm::random_engine engine(seed);
+
   auto heightmap_node = node["heightmap"];
   if (!heightmap_node) {
     throw bad_structure("akagoria-map: missing 'heightmap' in parameters");
   }
 
+  auto sea_level_node = node["sea_level"];
+  if (!sea_level_node) {
+    throw bad_structure("mapmaker: missing 'sea_level' in 'tiled' output parameters");
+  }
+  auto sea_level = sea_level_node.as<double>();
+
+  auto unit_size_node = node["unit_size"];
+  if (!unit_size_node) {
+    throw bad_structure("mapmaker: missing 'unit_size' in 'tiled' output parameters");
+  }
+  auto unit_size = unit_size_node.as<mm::reachability::size_type>();
+
+  auto unit_talus_node = node["unit_talus"];
+  if (!unit_talus_node) {
+    throw bad_structure("mapmaker: missing 'unit_talus' in 'tiled' output parameters");
+  }
+  auto unit_talus = unit_talus_node.as<double>();
+
+  auto rivers_count_node = node["rivers_count"];
+  if (!rivers_count_node) {
+    throw bad_structure("mapmaker: missing 'rivers' in 'tiled' output parameters");
+  }
+  auto rivers_count = rivers_count_node.as<unsigned>();
+
+  auto rivers_min_source_altitude_node = node["rivers_min_source_altitude"];
+  if (!rivers_min_source_altitude_node) {
+    throw bad_structure("mapmaker: missing 'min_source_altitude' in 'tiled' output parameters");
+  }
+  auto rivers_min_source_altitude = rivers_min_source_altitude_node.as<double>();
+
+
+  /*
+   * load map and add decorations
+   */
   mm::heightmap map = mm::heightmap::input_from_pgm(heightmap_node.as<std::string>());
+
+  // rivers
+  auto watermap = compute_initial_watermap(map, sea_level);
+
+  auto rivers = generate_rivers(map, watermap, rivers_count, rivers_min_source_altitude, engine);
+  for (auto river : rivers) {
+    for (auto water : river) {
+      watermap(water) = true;
+    }
+  }
+
+  // humidity
+  auto humiditymap = compute_humiditymap(watermap);
+  humiditymap.output_to_pgm("humidity.pnm");
+
+  // biomes
+  biomeset set = biomeset::whittaker();
+  mm::planemap<int> biomemap(mm::size_only, map);
+
+  for (auto fp : map.positions()) {
+    biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
+  }
+
+
 
 
 }
