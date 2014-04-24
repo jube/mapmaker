@@ -800,11 +800,13 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 
 
   /*
-   * load map and add decorations
+   * load map
    */
   mm::heightmap map = mm::heightmap::input_from_pgm(heightmap_node.as<std::string>());
 
-  // rivers
+  /*
+   * generate rivers
+   */
   auto watermap = compute_initial_watermap(map, sea_level);
 
   auto rivers = generate_rivers(map, watermap, rivers_count, rivers_min_source_altitude, engine);
@@ -814,11 +816,15 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
     }
   }
 
-  // humidity
+  /*
+   * compute humidity
+   */
   auto humiditymap = compute_humiditymap(watermap);
   humiditymap.output_to_pgm("humidity.pnm");
 
-  // biomes
+  /*
+   * compute biomes
+   */
   biomeset set = biomeset::whittaker();
   mm::planemap<int> biomemap(mm::size_only, map);
 
@@ -826,10 +832,14 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
     biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
   }
 
-  // tilemap
+  /*
+   * compute the tilemap
+   */
   auto tilemap = compute_tilemap(biomemap);
 
-  // tileset
+  /*
+   * compute tileset
+   */
 #define FIRST_GID 1
 
   auto terrains = set.terrains();
@@ -849,7 +859,9 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   auto img = compute_tileset_image(tiles, set);
   img.output_to_ppm(imgname);
 
-  // unit map
+  /*
+   * compute the unit map
+   */
   mm::heightmap::size_type size_max, size_min;
   std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
   auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
@@ -858,7 +870,9 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   std::tie(std::ignore, unit_map, std::ignore) =
       mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
 
-  // tmx file
+  /*
+   * compute the tmx file
+   */
   std::ofstream file(filename);
   file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   file << "<map version=\"1.0\" orientation=\"orthogonal\" ";
