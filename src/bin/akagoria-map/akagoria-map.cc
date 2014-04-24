@@ -296,6 +296,16 @@ namespace {
     int m_details[2][2] = { { -1, -1 }, { -1, -1 } };
   };
 
+  static bool operator==(const tile& left, const tile& right) {
+    for (auto where : { tile::detail::NW, tile::detail::NE, tile::detail::SW, tile::detail::SE }) {
+      if (left.biome(where) != right.biome(where)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   class tilemap : public mm::planemap<tile> {
   public:
     typedef typename mm::planemap<tile>::value_type value_type;
@@ -357,6 +367,58 @@ namespace {
 
     // specialized methods
   };
+
+  class tileset {
+  public:
+    tileset(int first_gid)
+    : m_first_gid(first_gid)
+    , m_tile_id(0)
+    {
+    }
+
+    typedef std::map<int, tile>::const_iterator const_iterator;
+
+    const_iterator begin() const {
+      return m_tiles.begin();
+    }
+
+    const_iterator end() const {
+      return m_tiles.end();
+    }
+
+    std::size_t size() const {
+      return m_tiles.size();
+    }
+
+    int compute_id(const tile& terrain) {
+      for (auto value : m_tiles) {
+        if (terrain == value.second) {
+          return value.first + m_first_gid;
+        }
+      }
+
+      int id = m_tile_id++;
+      m_tiles.emplace(id, terrain);
+
+      return id + m_first_gid;
+    }
+
+    int compute_biome_id(int biome) {
+      tile dummy;
+      dummy.set_biome(tile::detail::NW, biome);
+      dummy.set_biome(tile::detail::NE, biome);
+      dummy.set_biome(tile::detail::SW, biome);
+      dummy.set_biome(tile::detail::SE, biome);
+      return compute_id(dummy);
+    }
+
+  private:
+    int m_first_gid;
+    int m_tile_id;
+    std::map<int, tile> m_tiles;
+  };
+
+
 
   /*
    * misc
@@ -502,7 +564,37 @@ static mm::heightmap compute_humiditymap(const mm::binarymap& watermap) {
         queue.push({ x, y });
       }
     }
-  }
+  }  class tileset {
+  public:
+    tileset(int first_gid)
+    : m_first_gid(first_gid)
+    , m_tile_id(0)
+    {
+    }
+
+    typedef std::map<int, tile>::const_iterator const_iterator;
+
+    const_iterator begin() const {
+      return m_tiles.begin();
+    }
+
+    const_iterator end() const {
+      return m_tiles.end();
+    }
+
+    std::size_t size() const {
+      return m_tiles.size();
+    }
+
+    int compute_id(const tile& terrain);
+    int compute_biome_id(int biome);
+
+  private:
+    int m_first_gid;
+    int m_tile_id;
+    std::map<int, tile> m_tiles;
+  };
+
 
   mm::binarymap computed(watermap);
 
