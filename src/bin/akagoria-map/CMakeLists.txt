@@ -3,16 +3,6 @@ link_directories(${YAMLCPP_LIBRARY_DIRS})
 
 set(AKAGORIA_MAP_SRC
   akagoria-map.cc
-  biome.cc
-  biomeset.cc
-  biomize.cc
-  decorate.cc
-  tile.cc
-  tile_image.cc
-  tilemap.cc
-  tileset.cc
-  tilize.cc
-
 )
 
 add_executable(akagoria-map ${AKAGORIA_MAP_SRC})
