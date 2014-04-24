@@ -17,15 +17,10 @@
 
 #include <cassert>
 
-#include <mm/biomeset.h>
-#include <mm/biomize.h>
 #include <mm/colorize.h>
-#include <mm/decorate.h>
 #include <mm/playability.h>
 #include <mm/reachability.h>
 #include <mm/shader.h>
-#include <mm/tilemap.h>
-#include <mm/tilize.h>
 
 #include "exception.h"
 #include "print.h"
@@ -75,6 +70,7 @@ namespace mm {
 
       colored.output_to_ppm(filename);
 
+#if 0
     } else if (type == "tiled") {
       auto parameters_node = node["parameters"];
       if (!parameters_node) {
@@ -130,6 +126,7 @@ namespace mm {
 //       colored = shader(sea_level)(colored, map);
 
       colored.output_to_ppm(filename);
+#endif
 
     } else if (type == "grayscale") {
       map.output_to_pgm(filename);

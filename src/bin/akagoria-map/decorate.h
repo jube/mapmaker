@@ -13,39 +13,34 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/tileset.h>
+#ifndef MM_DECORATE_H
+#define MM_DECORATE_H
 
-#include <cassert>
-#include <iostream>
+#include <mm/heightmap.h>
+#include <mm/random.h>
+
+#include "biomeset.h"
+#include "tilemap.h"
 
 namespace mm {
-  static bool are_tiles_equal(const tile& left, const tile& right) {
-    for (auto where : { tile::detail::NW, tile::detail::NE, tile::detail::SW, tile::detail::SE }) {
-      if (left.biome(where) != right.biome(where)) {
-        return false;
-      }
+
+  class decorate {
+  public:
+    decorate(double sea_level, unsigned rivers, double min_source_altitude)
+    : m_sea_level(sea_level)
+    , m_rivers(rivers)
+    , m_min_source_altitude(min_source_altitude)
+    {
     }
 
-    return true;
-  }
+    tilemap operator()(const heightmap& src, const biomeset& set, random_engine& engine) const;
 
-  int tileset::compute_id(const tile& terrain) {
-    for (auto value : m_tiles) {
-      if (are_tiles_equal(terrain, value.second)) {
-        return value.first + m_first_gid;
-      }
-    }
-
-    int id = m_tile_id++;
-    m_tiles.emplace(id, terrain);
-
-    return id + m_first_gid;
-  }
-
-  int tileset::compute_biome_id(int biome) {
-    tile dummy;
-    dummy.set_biome(biome);
-    return compute_id(dummy);
-  }
+  private:
+    double m_sea_level;
+    unsigned m_rivers;
+    double m_min_source_altitude;
+  };
 
 }
+
+#endif // MM_DECORATE_H

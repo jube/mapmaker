@@ -13,16 +13,17 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/tilize.h>
+#include "tilize.h"
 
 #include <cassert>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-#include <mm/tile_image.h>
-#include <mm/tileset.h>
 #include <mm/hull.h>
+
+#include "tile_image.h"
+#include "tileset.h"
 
 #define FIRST_GID 1
 

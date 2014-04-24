@@ -72,6 +72,7 @@ namespace mm {
     return lerp(c1, c2, (offset - t1) / (t2 - t1));
   }
 
+#if 0
   biomeset color_ramp::compute_biomeset() const {
     std::vector<double> limits;
 
@@ -115,7 +116,7 @@ namespace mm {
 
     return set;
   }
-
+#endif
 
   color_ramp color_ramp::basic() {
     // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415

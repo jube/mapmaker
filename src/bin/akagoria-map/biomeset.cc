@@ -13,13 +13,13 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/biomeset.h>
+#include "biomeset.h"
 
 #include <cassert>
 #include <fstream>
 
-#include <mm/biomize.h>
-#include <mm/tilemap.h>
+#include "biomize.h"
+#include "tilemap.h"
 
 namespace mm {
 

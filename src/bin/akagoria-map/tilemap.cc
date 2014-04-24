@@ -13,42 +13,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_BIOMESET_H
-#define MM_BIOMESET_H
-
-#include <iosfwd>
-#include <map>
-
-#include <mm/biome.h>
+#include "tilemap.h"
 
 namespace mm {
 
-  class biomeset {
-  public:
-    biomeset()
-    : m_terrain_id(0)
-    {
-    }
-
-    biome& add_terrain(const biome& biome);
-    int get_next_id() const;
-
-    int compute_biome(double altitude, double humidity, bool water) const;
-    bool has_higher_priority(int biome_id, int other_biome_id) const;
-
-    const std::string& name(int biome) const;
-    color biome_representation(int biome) const;
-
-    void output_to_ppm(std::ostream& file) const;
-    void output_to_ppm(const std::string& filename) const;
-
-    static biomeset whittaker();
-
-  private:
-    int m_terrain_id;
-    std::map<int, biome> m_terrains;
-  };
 
 }
-
-#endif // MM_BIOMESET_H

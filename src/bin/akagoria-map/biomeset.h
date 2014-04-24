@@ -13,33 +13,42 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_BIOMIZE_H
-#define MM_BIOMIZE_H
+#ifndef MM_BIOMESET_H
+#define MM_BIOMESET_H
 
-#include <mm/biomeset.h>
-#include <mm/colormap.h>
-#include <mm/tilemap.h>
+#include <iosfwd>
+#include <map>
+
+#include "biome.h"
 
 namespace mm {
 
-  class biomize {
+  class biomeset {
   public:
-    enum class kind {
-      SIMPLE,
-      DETAILED
-    };
-
-    biomize(kind k)
-    : m_kind(k)
+    biomeset()
+    : m_terrain_id(0)
     {
     }
 
-    colormap operator()(const tilemap& src, const biomeset& set) const;
+    biome& add_terrain(const biome& biome);
+    int get_next_id() const;
+
+    int compute_biome(double altitude, double humidity, bool water) const;
+    bool has_higher_priority(int biome_id, int other_biome_id) const;
+
+    const std::string& name(int biome) const;
+    color biome_representation(int biome) const;
+
+    void output_to_ppm(std::ostream& file) const;
+    void output_to_ppm(const std::string& filename) const;
+
+    static biomeset whittaker();
 
   private:
-    kind m_kind;
+    int m_terrain_id;
+    std::map<int, biome> m_terrains;
   };
 
 }
 
-#endif // MM_BIOMIZE_H
+#endif // MM_BIOMESET_H

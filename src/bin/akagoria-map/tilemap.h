@@ -17,7 +17,8 @@
 #define MM_TILEMAP_H
 
 #include <mm/planemap.h>
-#include <mm/tile.h>
+
+#include "tile.h"
 
 namespace mm {
 

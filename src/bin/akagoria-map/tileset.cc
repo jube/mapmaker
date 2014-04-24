@@ -13,22 +13,39 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILE_IMAGE_H
-#define MM_TILE_IMAGE_H
+#include "tileset.h"
 
-#include <mm/colormap.h>
-#include <mm/biomeset.h>
-#include <mm/tileset.h>
-
-#define TILE_SIZE 32
+#include <cassert>
+#include <iostream>
 
 namespace mm {
+  static bool are_tiles_equal(const tile& left, const tile& right) {
+    for (auto where : { tile::detail::NW, tile::detail::NE, tile::detail::SW, tile::detail::SE }) {
+      if (left.biome(where) != right.biome(where)) {
+        return false;
+      }
+    }
 
-  class tile_image {
-  public:
-    colormap operator()(const tileset& tiles, const biomeset& set) const;
-  };
+    return true;
+  }
+
+  int tileset::compute_id(const tile& terrain) {
+    for (auto value : m_tiles) {
+      if (are_tiles_equal(terrain, value.second)) {
+        return value.first + m_first_gid;
+      }
+    }
+
+    int id = m_tile_id++;
+    m_tiles.emplace(id, terrain);
+
+    return id + m_first_gid;
+  }
+
+  int tileset::compute_biome_id(int biome) {
+    tile dummy;
+    dummy.set_biome(biome);
+    return compute_id(dummy);
+  }
 
 }
-
-#endif // MM_TILE_IMAGE_H

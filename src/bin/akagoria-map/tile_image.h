@@ -13,20 +13,23 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_TILIZE_H
-#define MM_TILIZE_H
+#ifndef MM_TILE_IMAGE_H
+#define MM_TILE_IMAGE_H
 
-#include <mm/biomeset.h>
-#include <mm/tilemap.h>
-#include <mm/binarymap.h>
+#include <mm/colormap.h>
+
+#include "biomeset.h"
+#include "tileset.h"
+
+#define TILE_SIZE 32
 
 namespace mm {
 
-  class tilize {
+  class tile_image {
   public:
-    void operator()(const tilemap& src, const biomeset& set, const binarymap& reachable, const std::string& tmx_name, const std::string& img_name) const;
+    colormap operator()(const tileset& tiles, const biomeset& set) const;
   };
 
 }
 
-#endif // MM_TILIZE_H
+#endif // MM_TILE_IMAGE_H

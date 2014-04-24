@@ -19,7 +19,6 @@
 #include <map>
 
 #include <mm/color.h>
-#include <mm/biomeset.h>
 
 namespace mm {
 
@@ -38,7 +37,7 @@ namespace mm {
 
     color compute_color(double offset) const;
 
-    biomeset compute_biomeset() const;
+//     biomeset compute_biomeset() const;
 
     static color_ramp basic();
 

@@ -13,7 +13,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/decorate.h>
+#include "decorate.h"
 
 #include <cassert>
 #include <iostream>
@@ -21,6 +21,7 @@
 
 #include <mm/binarymap.h>
 #include <mm/utils.h>
+
 
 namespace mm {
 

@@ -2,15 +2,11 @@
 set(LIBMM_SRC
   accessibility.cc
   binarymap.cc
-  biome.cc
-  biomeset.cc
-  biomize.cc
   cell_noise.cc
   colorize.cc
   colormap.cc
   color_ramp.cc
   cutoff.cc
-  decorate.cc
   diamond_square.cc
   erosion_score.cc
   fast_erosion.cc
@@ -34,11 +30,6 @@ set(LIBMM_SRC
   simplex_noise.cc
   slope.cc
   smooth.cc
-  tile.cc
-  tile_image.cc
-  tilemap.cc
-  tileset.cc
-  tilize.cc
   thermal_erosion.cc
   value_noise.cc
 )

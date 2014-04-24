@@ -13,33 +13,21 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef MM_DECORATE_H
-#define MM_DECORATE_H
+#ifndef MM_TILIZE_H
+#define MM_TILIZE_H
 
-#include <mm/heightmap.h>
-#include <mm/random.h>
-#include <mm/tilemap.h>
-#include <mm/biomeset.h>
+#include <mm/binarymap.h>
+
+#include "biomeset.h"
+#include "tilemap.h"
 
 namespace mm {
 
-  class decorate {
+  class tilize {
   public:
-    decorate(double sea_level, unsigned rivers, double min_source_altitude)
-    : m_sea_level(sea_level)
-    , m_rivers(rivers)
-    , m_min_source_altitude(min_source_altitude)
-    {
-    }
-
-    tilemap operator()(const heightmap& src, const biomeset& set, random_engine& engine) const;
-
-  private:
-    double m_sea_level;
-    unsigned m_rivers;
-    double m_min_source_altitude;
+    void operator()(const tilemap& src, const biomeset& set, const binarymap& reachable, const std::string& tmx_name, const std::string& img_name) const;
   };
 
 }
 
-#endif // MM_DECORATE_H
+#endif // MM_TILIZE_H
