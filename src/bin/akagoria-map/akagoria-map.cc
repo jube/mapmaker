@@ -15,6 +15,8 @@
  */
 #include <cinttypes>
 #include <cstdio>
+
+#include <algorithm>
 #include <exception>
 #include <fstream>
 #include <queue>
@@ -92,7 +94,12 @@ namespace {
     }
 
     bool has_higher_priority(const biome& other) const {
-      return false;
+      if (m_climates.front().water != other.m_climates.front().water) {
+        std::cerr << "YES\n";
+        return m_climates.front().water;
+      }
+
+      return m_climates.front().humidity.min < other.m_climates.front().humidity.min;
     }
 
   private:
@@ -577,37 +584,7 @@ static mm::heightmap compute_humiditymap(const mm::binarymap& watermap) {
         queue.push({ x, y });
       }
     }
-  }  class tileset {
-  public:
-    tileset(int first_gid)
-    : m_first_gid(first_gid)
-    , m_tile_id(0)
-    {
-    }
-
-    typedef std::map<int, tile>::const_iterator const_iterator;
-
-    const_iterator begin() const {
-      return m_tiles.begin();
-    }
-
-    const_iterator end() const {
-      return m_tiles.end();
-    }
-
-    std::size_t size() const {
-      return m_tiles.size();
-    }
-
-    int compute_id(const tile& terrain);
-    int compute_biome_id(int biome);
-
-  private:
-    int m_first_gid;
-    int m_tile_id;
-    std::map<int, tile> m_tiles;
-  };
-
+  }
 
   mm::binarymap computed(watermap);
 
@@ -668,8 +645,57 @@ static tilemap compute_tilemap(const mm::planemap<int>& biomemap) {
   return map;
 }
 
-#define TILE_SIZE 32
-#define EXT_TILE_SIZE (TILE_SIZE + 2)
+static constexpr std::size_t TILE_SIZE = 32;
+static constexpr std::size_t EXT_TILE_SIZE = TILE_SIZE + 2;
+static constexpr std::size_t EXT_TILE_SIZE_2 = EXT_TILE_SIZE / 2;
+
+static void draw_rectangle(mm::colormap& map, std::size_t x, std::size_t y, mm::color color) {
+  for (std::size_t dx = 0; dx < EXT_TILE_SIZE_2; dx++) {
+    for (std::size_t dy = 0; dy < EXT_TILE_SIZE_2; dy++) {
+      map(x + dx, y + dy) = color;
+    }
+  }
+}
+
+static void draw_triangles_slash(mm::colormap& map, std::size_t x, std::size_t y, mm::color color_hi, mm::color color_lo, bool limit_is_high) {
+  for (std::size_t dx = 0; dx < EXT_TILE_SIZE_2; dx++) {
+    std::size_t stop = 0;
+    if (limit_is_high) {
+      stop = EXT_TILE_SIZE_2 - dx;
+    } else {
+      if (dx < EXT_TILE_SIZE_2 - 2) {
+        stop = EXT_TILE_SIZE_2 - dx - 2;
+      }
+    }
+    for (std::size_t dy = 0; dy < EXT_TILE_SIZE_2; dy++) {
+      if (dy < stop) {
+        map(x + dx, y + dy) = color_hi;
+      } else {
+        map(x + dx, y + dy) = color_lo;
+      }
+    }
+  }
+}
+
+static void draw_triangles_backslash(mm::colormap& map, std::size_t x, std::size_t y, mm::color color_hi, mm::color color_lo, bool limit_is_high) {
+  for (std::size_t dx = 0; dx < EXT_TILE_SIZE_2; dx++) {
+    std::size_t stop = 0;
+    if (limit_is_high) {
+      stop = dx + 1;
+    } else {
+      if (dx > 1) {
+        stop = dx - 1;
+      }
+    }
+    for (std::size_t dy = 0; dy < EXT_TILE_SIZE_2; dy++) {
+      if (dy < stop) {
+        map(x + dx, y + dy) = color_hi;
+      } else {
+        map(x + dx, y + dy) = color_lo;
+      }
+    }
+  }
+}
 
 mm::colormap compute_tileset_image(const tileset& tiles, const biomeset& set) {
   std::size_t tiles_count = tiles.size();
@@ -688,51 +714,74 @@ mm::colormap compute_tileset_image(const tileset& tiles, const biomeset& set) {
   for (auto value : tiles) {
     std::size_t i = idx % dim;
     std::size_t x0 = i * EXT_TILE_SIZE;
-    std::size_t x2 = x0 + EXT_TILE_SIZE;
-    std::size_t x1 = x0 + (x2 - x0) / 2;
+    std::size_t x1 = x0 + EXT_TILE_SIZE_2;
 
     std::size_t j = idx / dim;
     std::size_t y0 = j * EXT_TILE_SIZE;
-    std::size_t y2 = y0 + EXT_TILE_SIZE;
-    std::size_t y1 = y0 + (y2 - y0) / 2;
+    std::size_t y1 = y0 + EXT_TILE_SIZE_2;
 
     auto tile = value.second;
 
-    {
-      int biome = tile.biome(tile::detail::NW);
-      auto rep = set.biome_representation(biome);
-      for (auto x = x0; x < x1; x++) {
-        for (auto y = y0; y < y1; y++) {
-          map(x, y) = rep;
-        }
+    int biome_nw = tile.biome(tile::detail::NW);
+    int biome_ne = tile.biome(tile::detail::NE);
+    int biome_sw = tile.biome(tile::detail::SW);
+    int biome_se = tile.biome(tile::detail::SE);
+
+    auto color_nw = set.biome_representation(biome_nw);
+    auto color_ne = set.biome_representation(biome_ne);
+    auto color_sw = set.biome_representation(biome_sw);
+    auto color_se = set.biome_representation(biome_se);
+
+    // NW
+    if (biome_ne == biome_sw) {
+      int biome_anti = biome_ne;
+      auto color_anti = color_ne;
+      if (biome_nw != biome_se || !set.has_higher_priority(biome_nw, biome_anti)) {
+        draw_triangles_slash(map, x0, y0, color_nw, color_anti, true);
+      } else {
+        draw_rectangle(map, x0, y0, color_nw);
       }
+    } else {
+      draw_rectangle(map, x0, y0, color_nw);
     }
-    {
-      int biome = tile.biome(tile::detail::NE);
-      auto rep = set.biome_representation(biome);
-      for (auto x = x1; x < x2; x++) {
-        for (auto y = y0; y < y1; y++) {
-          map(x, y) = rep;
-        }
+
+    // SE
+    if (biome_ne == biome_sw) {
+      int biome_anti = biome_ne;
+      auto color_anti = color_ne;
+      if (biome_se != biome_nw || !set.has_higher_priority(biome_se, biome_anti)) {
+        draw_triangles_slash(map, x1, y1, color_anti, color_se, false);
+      } else {
+        draw_rectangle(map, x1, y1, color_se);
       }
+    } else {
+      draw_rectangle(map, x1, y1, color_se);
     }
-    {
-      int biome = tile.biome(tile::detail::SW);
-      auto rep = set.biome_representation(biome);
-      for (auto x = x0; x < x1; x++) {
-        for (auto y = y1; y < y2; y++) {
-          map(x, y) = rep;
-        }
+
+    // NE
+    if (biome_nw == biome_se) {
+      int biome_anti = biome_nw;
+      auto color_anti = color_nw;
+      if (biome_ne != biome_sw || !set.has_higher_priority(biome_ne, biome_anti)) {
+        draw_triangles_backslash(map, x1, y0, color_ne, color_anti, true);
+      } else {
+        draw_rectangle(map, x1, y0, color_ne);
       }
+    } else {
+      draw_rectangle(map, x1, y0, color_ne);
     }
-    {
-      int biome = tile.biome(tile::detail::SE);
-      auto rep = set.biome_representation(biome);
-      for (auto x = x1; x < x2; x++) {
-        for (auto y = y1; y < y2; y++) {
-          map(x, y) = rep;
-        }
+
+    // SW
+    if (biome_nw == biome_se) {
+      int biome_anti = biome_nw;
+      auto color_anti = color_nw;
+      if (biome_sw != biome_ne || !set.has_higher_priority(biome_sw, biome_anti)) {
+        draw_triangles_backslash(map, x0, y1, color_anti, color_sw, false);
+      } else {
+        draw_rectangle(map, x0, y1, color_sw);
       }
+    } else {
+      draw_rectangle(map, x0, y1, color_sw);
     }
 
     idx++;
@@ -830,6 +879,7 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 
   for (auto fp : map.positions()) {
     biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
+    assert(biomemap(fp) != -1);
   }
 
   /*
