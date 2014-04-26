@@ -25,12 +25,14 @@
 #include <yaml-cpp/yaml.h>
 
 #include <mm/color.h>
+#include <mm/colorize.h>
 #include <mm/colormap.h>
 #include <mm/heightmap.h>
 #include <mm/hull.h>
 #include <mm/playability.h>
 #include <mm/random.h>
 #include <mm/reachability.h>
+#include <mm/shader.h>
 #include <mm/utils.h>
 
 namespace {
@@ -95,7 +97,6 @@ namespace {
 
     bool has_higher_priority(const biome& other) const {
       if (m_climates.front().water != other.m_climates.front().water) {
-        std::cerr << "YES\n";
         return m_climates.front().water;
       }
 
@@ -848,6 +849,8 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   auto rivers_min_source_altitude = rivers_min_source_altitude_node.as<double>();
 
 
+  bool output_intermediates = true;
+
   /*
    * load map
    */
@@ -865,21 +868,71 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
     }
   }
 
+  // display the original map with the rivers
+
+  if (output_intermediates) {
+    auto colored = mm::colorize(mm::color_ramp::basic(), sea_level)(map);
+
+    for (auto river : rivers) {
+      for (auto water : river) {
+        colored(water) = { 0x44, 0x77, 0xAA }; // { 17,  82, 112 };
+      }
+    }
+
+    auto shaded = mm::shader(sea_level)(colored, map);
+    shaded.output_to_ppm("map_with_rivers.pnm");
+  }
+
   /*
    * compute humidity
    */
   auto humiditymap = compute_humiditymap(watermap);
-  humiditymap.output_to_pgm("humidity.pnm");
+
+  if (output_intermediates) {
+    humiditymap.output_to_pgm("humidity.pnm");
+  }
 
   /*
    * compute biomes
    */
   biomeset set = biomeset::whittaker();
+
+  if (output_intermediates) {
+#define BIOMESET_SIZE 256
+    mm::colormap biomes(BIOMESET_SIZE, BIOMESET_SIZE);
+
+    for (auto x : biomes.x_range()) {
+      double humidity = static_cast<double>(x) / BIOMESET_SIZE;
+      for (auto y : biomes.y_range()) {
+        double altitude = static_cast<double>(BIOMESET_SIZE - y) / BIOMESET_SIZE * 0.5 + 0.5;
+
+        int biome = set.compute_biome(altitude, humidity, false);
+        biomes(x, y) = set.biome_representation(biome);
+      }
+    }
+
+    biomes.output_to_ppm("biomeset.pnm");
+  }
+
+
   mm::planemap<int> biomemap(mm::size_only, map);
 
   for (auto fp : map.positions()) {
     biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
     assert(biomemap(fp) != -1);
+  }
+
+  if (output_intermediates) {
+    mm::colormap biomes(mm::size_only, biomemap);
+
+    for (auto fp : biomes.positions()) {
+      biomes(fp) = set.biome_representation(biomemap(fp));
+    }
+
+    biomes.output_to_ppm("map_of_biomes.pnm");
+
+    biomes = mm::shader(sea_level)(biomes, map);
+    biomes.output_to_ppm("map_of_biomes_shaded.pnm");
   }
 
   /*
@@ -919,6 +972,10 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   mm::binarymap unit_map;
   std::tie(std::ignore, unit_map, std::ignore) =
       mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
+
+  if (output_intermediates) {
+    unit_map.output_to_pbm("unit_map.pnm");
+  }
 
   /*
    * compute the tmx file
@@ -1027,7 +1084,7 @@ int main(int argc, char *argv[]) {
 
   try {
     YAML::Node node = YAML::LoadFile(argv[1]);
-    generate_akagoria_map(node, "map.tmx", "biome.pnm");
+    generate_akagoria_map(node, "map.tmx", "biomes.pnm");
 
   } catch (std::exception& ex) {
     std::printf("Error: %s\n", ex.what());
