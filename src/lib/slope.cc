@@ -20,41 +20,21 @@
 namespace mm {
 
   heightmap slope::operator()(const heightmap& src) {
-    typedef typename heightmap::size_type size_type;
-
     heightmap map(size_only, src);
 
-    for (size_type x = 0; x < src.width(); ++x) {
-      for (size_type y = 0; y < src.height(); ++y) {
-        double value = 0.0;
+    for (heightmap::size_type x = 0; x < src.width(); ++x) {
+      for (heightmap::size_type y = 0; y < src.height(); ++y) {
+        const double altitude_here = src(x, y);
+        double altitude_difference_max = 0.0;
 
-        for (int i = -1; i <= 1; ++i) {
-          if (x == 0 && i == -1) {
-            continue;
+        src.visit8neighbours(x, y, [altitude_here, &altitude_difference_max](position pos, double altitude_there) {
+          double altitude_difference = std::abs(altitude_here - altitude_there);
+          if (altitude_difference > altitude_difference_max) {
+            altitude_difference_max = altitude_difference;
           }
+        });
 
-          if (x == src.width() - 1 && i == 1) {
-            continue;
-          }
-
-          for (int j = -1; j <= 1; ++j) {
-            if (y == 0 && j == -1) {
-              continue;
-            }
-
-            if (y == src.height() - 1 && j == 1) {
-              continue;
-            }
-
-            double diff = std::abs(src(x, y) - src(x+i, y+j));
-
-            if (diff > value) {
-              value = diff;
-            }
-          }
-        }
-
-        map(x, y) = value;
+        map(x, y) = altitude_difference_max;
       }
     }
 

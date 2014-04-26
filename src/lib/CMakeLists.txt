@@ -16,11 +16,14 @@ set(LIBMM_SRC
   gradient_noise.cc
   heightmap.cc
   hills.cc
+  hull.cc
   hydraulic_erosion.cc
+  invert.cc
   islandize.cc
   logical_combine.cc
   midpoint_displacement.cc
   normalize.cc
+  playability.cc
   ratio.cc
   reachability.cc
   shader.cc

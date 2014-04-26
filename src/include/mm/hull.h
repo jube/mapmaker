@@ -13,20 +13,20 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#ifndef MM_HULL_H
+#define MM_HULL_H
 
-#include <iosfwd>
+#include <vector>
 
-#include <mm/color_ramp.h>
-#include <mm/heightmap.h>
-#include <mm/random.h>
-#include <yaml-cpp/yaml.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
-  void output_heightmap(const heightmap& map, YAML::Node node, random_engine& engine);
+  class hull {
+  public:
+    std::vector<std::vector<position>> operator()(const binarymap& src) const;
+  };
 
 }
 
-#endif // OUTPUT_H
+#endif // MM_HULL_H

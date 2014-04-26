@@ -16,6 +16,7 @@
 #ifndef MM_BINARYMAP_H
 #define MM_BINARYMAP_H
 
+#include <functional>
 #include <iosfwd>
 
 #include <mm/planemap.h>
@@ -85,6 +86,8 @@ namespace mm {
 
     void output_to_pbm(const std::string& filename) const;
     void output_to_pbm(std::ostream& file) const;
+
+    size_type walk(position start, std::function<void(position)> func);
 
   };
 
