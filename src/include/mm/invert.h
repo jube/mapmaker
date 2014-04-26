@@ -13,45 +13,18 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <mm/accessibility.h>
+#ifndef MM_INVERT_H
+#define MM_INVERT_H
 
-#include <mm/invert.h>
+#include <mm/binarymap.h>
 
 namespace mm {
 
-  binarymap accessibility::operator()(const binarymap& src) {
-    binarymap visited = invert()(src);
-
-    position best_pos{0, 0};
-    binarymap::size_type best_count = 0;
-
-    for (auto x : visited.x_range()) {
-      for (auto y : visited.y_range()) {
-        position pos{x, y};
-
-        if (visited(pos)) {
-          continue;
-        }
-
-        binarymap::size_type count = visited.walk(pos, nullptr);
-
-        if (count > best_count) {
-          best_pos = pos;
-          best_count = count;
-        }
-      }
-    }
-
-    visited = invert()(src);
-
-    binarymap map(src.width(), src.height(), false);
-
-    map(best_pos) = true;
-    visited.walk(best_pos, [&map](position pos) {
-      map(pos) = true;
-    });
-
-    return map;
-  }
+  class invert {
+  public:
+    binarymap operator()(const binarymap& src) const;
+  };
 
 }
+
+#endif // MM_INVERT_H

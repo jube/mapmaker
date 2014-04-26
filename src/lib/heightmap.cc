@@ -16,6 +16,7 @@
 #include <mm/heightmap.h>
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 
 namespace mm {
@@ -37,7 +38,7 @@ namespace mm {
       }
     }
 
-    return std::move(sub);
+    return sub;
   }
 
   #define WHITE 65535
@@ -56,6 +57,43 @@ namespace mm {
 
       file << '\n';
     }
+  }
+
+  void heightmap::output_to_pgm(const std::string& filename) const {
+    std::ofstream file(filename);
+    output_to_pgm(file);
+  }
+
+  heightmap heightmap::input_from_pgm(std::istream& file) {
+    std::string header;
+    file >> header;
+    assert(header == "P2");
+
+    size_type width, height;
+    file >> width >> height;
+
+    unsigned white;
+    file >> white;
+
+    heightmap map(width, height);
+
+    for (size_type y = 0; y < height; ++y) {
+      for (size_type x = 0; x < width; ++x) {
+        unsigned value;
+        file >> value;
+        assert(0 <= value && value <= white);
+
+        map(x, y) = static_cast<double>(value) / white;
+      }
+    }
+
+    return map;
+  }
+
+
+  heightmap heightmap::input_from_pgm(const std::string& filename) {
+    std::ifstream file(filename);
+    return input_from_pgm(file);
   }
 
 }

@@ -16,10 +16,10 @@
 #include "output.h"
 
 #include <cassert>
-#include <fstream>
-#include <iostream>
 
 #include <mm/colorize.h>
+#include <mm/playability.h>
+#include <mm/reachability.h>
 #include <mm/shader.h>
 
 #include "exception.h"
@@ -27,7 +27,7 @@
 
 namespace mm {
 
-  void output_heightmap(const heightmap& map, YAML::Node node) {
+  void output_heightmap(const heightmap& map, YAML::Node node, random_engine& engine) {
     auto filename_node = node["filename"];
     if (!filename_node) {
       throw bad_structure("mapmaker: missing 'filename' in output definition");
@@ -42,8 +42,6 @@ namespace mm {
 
     print_indent();
     std::printf("\toutput: '" BEGIN_FILE "%s" END_FILE "'\n", filename.c_str());
-
-    std::ofstream file(filename);
 
     if (type == "colored") {
       auto parameters_node = node["parameters"];
@@ -63,28 +61,75 @@ namespace mm {
       }
       auto shaded = shaded_node.as<bool>();
 
-      // see: http://www.blitzbasic.com/codearcs/codearcs.php?code=2415
-      mm::color_ramp ramp;
-      ramp.add_color_stop(0.000, {  2,  43,  68}); // very dark blue: deep water
-      ramp.add_color_stop(0.250, {  9,  62,  92}); // dark blue: water
-      ramp.add_color_stop(0.490, { 17,  82, 112}); // blue: shallow water
-      ramp.add_color_stop(0.500, { 69, 108, 118}); // light blue: shore
-      ramp.add_color_stop(0.501, { 42, 102,  41}); // green: grass
-      ramp.add_color_stop(0.750, {115, 128,  77}); // light green: veld
-      ramp.add_color_stop(0.850, {153, 143,  92}); // brown: tundra
-      ramp.add_color_stop(0.950, {179, 179, 179}); // grey: rocks
-      ramp.add_color_stop(1.000, {255, 255, 255}); // white: snow
-
+      color_ramp ramp = color_ramp::basic();
       auto colored = colorize(ramp, sea_level)(map);
 
       if (shaded) {
         colored = shader(sea_level)(colored, map);
       }
 
-      colored.output_to_ppm(file);
+      colored.output_to_ppm(filename);
+
+#if 0
+    } else if (type == "tiled") {
+      auto parameters_node = node["parameters"];
+      if (!parameters_node) {
+        throw bad_structure("mapmaker: missing 'parameters' in 'tiled' output definition");
+      }
+
+      auto sea_level_node = parameters_node["sea_level"];
+      if (!sea_level_node) {
+        throw bad_structure("mapmaker: missing 'sea_level' in 'tiled' output parameters");
+      }
+      auto sea_level = sea_level_node.as<double>();
+
+      auto nu_node = parameters_node["unit_size"];
+      if (!nu_node) {
+        throw bad_structure("mapmaker: missing 'unit_size' in 'tiled' output parameters");
+      }
+      auto nu = nu_node.as<reachability::size_type>();
+
+      auto tu_node = parameters_node["unit_talus"];
+      if (!tu_node) {
+        throw bad_structure("mapmaker: missing 'unit_talus' in 'tiled' output parameters");
+      }
+      auto tu = tu_node.as<double>();
+
+      auto rivers_node = parameters_node["rivers"];
+      if (!rivers_node) {
+        throw bad_structure("mapmaker: missing 'rivers' in 'tiled' output parameters");
+      }
+      auto rivers = rivers_node.as<unsigned>();
+
+      auto min_source_altitude_node = parameters_node["min_source_altitude"];
+      if (!min_source_altitude_node) {
+        throw bad_structure("mapmaker: missing 'min_source_altitude' in 'tiled' output parameters");
+      }
+      auto min_source_altitude = min_source_altitude_node.as<double>();
+
+//       biomeset set = color_ramp::basic().compute_biomeset(sea_level);
+      biomeset set = biomeset::whittaker();
+
+      set.output_to_ppm("biomeset.ppm");
+
+      auto tiled = decorate(sea_level, rivers, min_source_altitude)(map, set, engine);
+      auto colored = biomize(biomize::kind::DETAILED)(tiled, set);
+
+      auto size_max = std::max(map.width(), map.height());
+      auto size_min = std::min(map.width(), map.height());
+      auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
+
+      binarymap unit_map;
+      std::tie(std::ignore, unit_map, std::ignore) = playability(sea_level, nu, nu, tu / size, tu / size, false)(map);
+      tilize()(tiled, set, unit_map, "map.tmx", "biome.pnm");
+
+//       colored = shader(sea_level)(colored, map);
+
+      colored.output_to_ppm(filename);
+#endif
 
     } else if (type == "grayscale") {
-      map.output_to_pgm(file);
+      map.output_to_pgm(filename);
     } else {
       std::printf("Warning! Unknown output type: '%s'. No output generated.\n", type.c_str());
     }

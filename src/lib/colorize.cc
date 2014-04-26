@@ -15,6 +15,8 @@
  */
 #include <mm/colorize.h>
 
+#include <mm/utils.h>
+
 namespace mm {
 
   colormap colorize::operator()(const heightmap& src) const {
@@ -22,19 +24,12 @@ namespace mm {
 
     for (heightmap::size_type x = 0; x < src.width(); ++x) {
       for (heightmap::size_type y = 0; y < src.height(); ++y) {
-        auto value = src(x, y);
-
-        if (value < m_sea_level) {
-          value = value / m_sea_level * 0.5;
-        } else {
-          value = (value - m_sea_level) / (1.0 - m_sea_level) * 0.5 + 0.5;
-        }
-
-        map(x, y) = m_ramp.get_color(value);
+        auto value = value_with_sea_level(src(x, y), m_sea_level);
+        map(x, y) = m_ramp.compute_color(value);
       }
     }
 
-    return std::move(map);
+    return map;
   }
 
 }

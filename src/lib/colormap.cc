@@ -15,6 +15,7 @@
  */
 #include <mm/colormap.h>
 
+#include <fstream>
 #include <iostream>
 
 namespace mm {
@@ -35,6 +36,11 @@ namespace mm {
 
       file << '\n';
     }
+  }
+
+  void colormap::output_to_ppm(const std::string& filename) const {
+    std::ofstream file(filename);
+    output_to_ppm(file);
   }
 
 }

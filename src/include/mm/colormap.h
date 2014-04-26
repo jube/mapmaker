@@ -85,6 +85,7 @@ namespace mm {
     // specialized methods
 
     void output_to_ppm(std::ostream& file) const;
+    void output_to_ppm(const std::string& filename) const;
 
   };
 

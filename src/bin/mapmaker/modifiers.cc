@@ -38,14 +38,16 @@ namespace mm {
 
     class intercept {
     public:
-      intercept(YAML::Node node)
-      : m_node(node) {
+      intercept(YAML::Node node, random_engine& engine)
+      : m_node(node)
+      , m_engine(engine)
+      {
       }
 
       heightmap operator()(const heightmap& src) {
         increment_indent();
-        auto map = process_modifiers(src, m_node);
-        process_finalizer(map, m_node);
+        auto map = process_modifiers(src, m_node, m_engine);
+        process_finalizer(map, m_node, m_engine);
         decrement_indent();
 
         return src;
@@ -53,6 +55,7 @@ namespace mm {
 
     private:
       YAML::Node m_node;
+      random_engine& m_engine;
     };
 
   }
@@ -65,8 +68,8 @@ namespace mm {
     return map;
   }
 
-  static modifier_function get_intercept_modifier(YAML::Node node, heightmap::size_type size) {
-    return intercept(node);
+  static modifier_function get_intercept_modifier(YAML::Node node, random_engine& engine) {
+    return intercept(node, engine);
   }
 
   static modifier_function get_islandize_modifier(YAML::Node node, heightmap::size_type size) {
@@ -191,7 +194,7 @@ namespace mm {
    * API
    */
 
-  modifier_function get_modifier(YAML::Node node, heightmap::size_type size) {
+  modifier_function get_modifier(YAML::Node node, heightmap::size_type size, random_engine& engine) {
     auto name_node = node["name"];
     if (!name_node) {
       throw bad_structure("mapmaker: missing 'name' in modifier definition");
@@ -204,7 +207,7 @@ namespace mm {
     auto parameters_node = node["parameters"];
 
     if (name == "intercept") {
-      return get_intercept_modifier(parameters_node, size);
+      return get_intercept_modifier(parameters_node, engine);
     }
 
     if (name == "islandize") {
@@ -238,7 +241,7 @@ namespace mm {
     return null_modifier;
   }
 
-  heightmap modify(const heightmap& src, modifier_function modifier, YAML::Node node) {
+  heightmap modify(const heightmap& src, modifier_function modifier, YAML::Node node, random_engine& engine) {
     auto start = std::chrono::steady_clock::now();
     auto map = modifier(src);
     map = normalize()(map);
@@ -251,10 +254,10 @@ namespace mm {
     auto output_node = node["output"];
 
     if (output_node) {
-      output_heightmap(map, output_node);
+      output_heightmap(map, output_node, engine);
     }
 
-    return std::move(map);
+    return map;
   }
 
 }

@@ -35,7 +35,11 @@ namespace mm {
 
     void add_color_stop(double offset, const color& c);
 
-    color get_color(double offset) const;
+    color compute_color(double offset) const;
+
+//     biomeset compute_biomeset() const;
+
+    static color_ramp basic();
 
   private:
     double m_min;

@@ -17,13 +17,14 @@
 #define PROCESS_H
 
 #include <mm/heightmap.h>
+#include <mm/random.h>
 #include <yaml-cpp/yaml.h>
 
 namespace mm {
 
-  heightmap process_generator(YAML::Node node);
-  heightmap process_modifiers(const heightmap& map, YAML::Node node);
-  void process_finalizer(const heightmap& map, YAML::Node node);
+  heightmap process_generator(YAML::Node node, random_engine& engine);
+  heightmap process_modifiers(const heightmap& map, YAML::Node node, random_engine& engine);
+  void process_finalizer(const heightmap& map, YAML::Node node, random_engine& engine);
 
 }
 

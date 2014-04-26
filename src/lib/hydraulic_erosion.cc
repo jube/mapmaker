@@ -135,7 +135,7 @@ namespace mm {
 
     }
 
-    return std::move(map);
+    return map;
   }
 
 }

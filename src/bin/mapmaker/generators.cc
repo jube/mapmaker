@@ -53,7 +53,7 @@ namespace mm {
           }
         }
 
-        return std::move(map);
+        return map;
       }
     };
 
@@ -177,7 +177,7 @@ namespace mm {
    */
   static heightmap null_generator(random_engine&, position::size_type width, position::size_type height) {
     heightmap map(width, height);
-    return std::move(map);
+    return map;
   }
 
 
@@ -378,10 +378,10 @@ namespace mm {
     auto output_node = node["output"];
 
     if (output_node) {
-      output_heightmap(map, output_node);
+      output_heightmap(map, output_node, engine);
     }
 
-    return std::move(map);
+    return map;
   }
 
 }
