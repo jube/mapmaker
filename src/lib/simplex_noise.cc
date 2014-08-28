@@ -41,7 +41,7 @@ namespace mm {
 
   }
 
-  static const vector2 s_gradients[12] = {
+  static const vector2 s_gradients[8] = {
     { -1.0, -1.0 },
     {  1.0,  0.0 },
     { -1.0,  0.0 },
@@ -54,7 +54,7 @@ namespace mm {
 
   const vector2& simplex_noise::grid(uint8_t i, uint8_t j) const {
     uint8_t index = i + m_perm.at(j);
-    return s_gradients[index % 12];
+    return s_gradients[index % 8];
   }
 
   static const double K = .366025403784438646763723170752; // (sqrt(3) - 1) / 2
