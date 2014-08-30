@@ -2,14 +2,20 @@
 
 ## MapMaker 0.3
 
-## 0.3.0 (26 Apr 2014)
+### 0.3.0 (26 Apr 2014)
 
 * new binary: akagoria-map
   special binary to generate a map suitable for the game Akagoria
 
+### 0.3.1 (30 Aug 2014)
+
+* bug fix: wrong size of the array of gradients (simplex noise)
+* bug fix: use of `emplace` in `color_ramp::add_color_stop` (Closes #1)
+* bug fix: use of `using` in finalizers.cc (Closes #2)
+
 ## MapMaker 0.2
 
-## 0.2.0 (02 Mar 2014)
+### 0.2.0 (02 Mar 2014)
 
 * new generators:
   * ramp

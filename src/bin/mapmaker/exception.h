@@ -23,7 +23,11 @@ namespace mm {
 
   class bad_structure : public std::runtime_error {
   public:
-    using std::runtime_error::runtime_error;
+    bad_structure(const std::string& reason)
+    : runtime_error(reason)
+    {
+
+    }
   };
 
 }

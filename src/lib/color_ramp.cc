@@ -47,7 +47,7 @@ namespace mm {
       }
     }
 
-    m_map.emplace(offset, c);
+    m_map.insert(std::make_pair(offset, c));
   }
 
   color color_ramp::compute_color(double offset) const {
