@@ -10,6 +10,7 @@
 ### 0.3.1 (30 Aug 2014)
 
 * bug fix: wrong size of the array of gradients (simplex noise)
+* bug fix: use of `emplace` in `color_ramp::add_color_stop` (Closes #1)
 * bug fix: use of `using` in finalizers.cc (Closes #2)
 
 ## MapMaker 0.2
