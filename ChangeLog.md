@@ -7,6 +7,11 @@
 * new binary: akagoria-map
   special binary to generate a map suitable for the game Akagoria
 
+### 0.3.1 (30 Aug 2014)
+
+* bug fix: wrong size of the array of gradients (simplex noise)
+* 
+
 ## MapMaker 0.2
 
 ### 0.2.0 (02 Mar 2014)
