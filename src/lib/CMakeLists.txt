@@ -36,6 +36,12 @@ set(LIBMM_SRC
 
 add_library(mm0 SHARED ${LIBMM_SRC})
 
+set_target_properties(mm0
+  PROPERTIES
+  VERSION ${CPACK_PACKAGE_VERSION}
+  SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}
+)
+
 install(
   TARGETS mm0
   LIBRARY DESTINATION lib
