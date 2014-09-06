@@ -771,7 +771,7 @@ public:
 };
 
 
-void generate_akagoria_map(YAML::Node node, std::string filename, std::string imgname) {
+void generate_biome_map(YAML::Node node, std::string filename, std::string imgname) {
   /*
    * get parameters
    */
@@ -789,36 +789,36 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 
   auto heightmap_node = node["heightmap"];
   if (!heightmap_node) {
-    throw bad_structure("akagoria-map: missing 'heightmap' in parameters");
+    throw bad_structure("biome-map: missing 'heightmap' in parameters");
   }
 
   auto sea_level_node = node["sea_level"];
   if (!sea_level_node) {
-    throw bad_structure("mapmaker: missing 'sea_level' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'sea_level' in 'tiled' output parameters");
   }
   auto sea_level = sea_level_node.as<double>();
 
   auto unit_size_node = node["unit_size"];
   if (!unit_size_node) {
-    throw bad_structure("mapmaker: missing 'unit_size' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'unit_size' in 'tiled' output parameters");
   }
   auto unit_size = unit_size_node.as<mm::reachability::size_type>();
 
   auto unit_talus_node = node["unit_talus"];
   if (!unit_talus_node) {
-    throw bad_structure("mapmaker: missing 'unit_talus' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'unit_talus' in 'tiled' output parameters");
   }
   auto unit_talus = unit_talus_node.as<double>();
 
   auto rivers_count_node = node["rivers_count"];
   if (!rivers_count_node) {
-    throw bad_structure("mapmaker: missing 'rivers' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'rivers' in 'tiled' output parameters");
   }
   auto rivers_count = rivers_count_node.as<unsigned>();
 
   auto rivers_min_source_altitude_node = node["rivers_min_source_altitude"];
   if (!rivers_min_source_altitude_node) {
-    throw bad_structure("mapmaker: missing 'min_source_altitude' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'min_source_altitude' in 'tiled' output parameters");
   }
   auto rivers_min_source_altitude = rivers_min_source_altitude_node.as<double>();
 
@@ -1047,7 +1047,7 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 }
 
 static void usage() {
-  std::printf("Usage: mapmaker <file>\n");
+  std::printf("Usage: biome-map <file>\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -1058,7 +1058,7 @@ int main(int argc, char *argv[]) {
 
   try {
     YAML::Node node = YAML::LoadFile(argv[1]);
-    generate_akagoria_map(node, "map.tmx", "biomes.pnm");
+    generate_biome_map(node, "map.tmx", "biomes.pnm");
 
   } catch (std::exception& ex) {
     std::printf("Error: %s\n", ex.what());
