@@ -67,8 +67,34 @@ namespace mm {
       return next.first.x > next.second.x;
     }
 
-    assert(false);
     return false;
+  }
+
+  static bool turn_right(const edge& current, const edge& next) {
+    assert(current.second == next.first);
+
+    if (current.first.x < current.second.x) {
+      return next.first.y < next.second.y;
+    }
+
+    if (current.first.x > current.second.x) {
+      return next.first.y > next.second.y;
+    }
+
+    if (current.first.y < current.second.y) {
+      return next.first.x > next.second.x;
+    }
+
+    if (current.first.y > current.second.y) {
+      return next.first.x < next.second.x;
+    }
+
+    return false;
+  }
+
+  inline position middle(const position& lhs, const position& rhs) {
+    assert(lhs != rhs);
+    return { (lhs.x + rhs.x) / 2, (lhs.y + rhs.y) / 2 };
   }
 
   std::vector<std::vector<position>> hull::operator()(const binarymap& src) const {
@@ -127,7 +153,7 @@ namespace mm {
       position first = current.first;
 
       std::vector<position> new_hull;
-      new_hull.push_back(first);
+      new_hull.push_back(transformed_position(first));
       used_edges.push_back(current);
 
       while (current.second != first) {
@@ -142,15 +168,55 @@ namespace mm {
 
           for (auto it = range.first; it != range.second; ++it) {
             auto next = *it;
-            if (turn_left(current, next)) {
+            if (turn_right(current, next)) {
               current = next;
               break;
             }
           }
         }
 
-        new_hull.push_back(current.first);
+        assert(new_hull.back() != current.first);
+
+        new_hull.push_back(transformed_position(current.first));
         used_edges.push_back(current);
+      }
+
+      if (m_type == angle_type::smooth) {
+        // check the angles and make them smooth
+
+        assert(new_hull.size() >= 4);
+        std::vector<position> smooth_hull;
+
+        position prev = new_hull.back();
+        new_hull.push_back(new_hull.front());
+
+        auto it = new_hull.begin();
+        position curr = *it++;
+        position next = *it++;
+
+        do {
+          edge e1{prev, curr};
+          edge e2{curr, next};
+
+          if (turn_left(e1, e2) || turn_right(e1, e2)) {
+            auto m1 = middle(prev, curr);
+            if (smooth_hull.empty() || smooth_hull.back() != m1) {
+              smooth_hull.push_back(m1);
+            }
+            auto m2 = middle(curr, next);
+            assert(smooth_hull.back() != m2);
+            smooth_hull.push_back(m2);
+          } else {
+            assert(smooth_hull.back() != curr);
+            smooth_hull.push_back(curr);
+          }
+
+          prev = curr;
+          curr = next;
+          next = *it++;
+        } while (it != new_hull.end());
+
+        std::swap(new_hull, smooth_hull);
       }
 
       hulls.push_back(std::move(new_hull));

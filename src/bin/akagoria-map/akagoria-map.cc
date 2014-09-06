@@ -949,20 +949,20 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   file << "\t<property name=\"kind\" value=\"zone\"/>\n";
   file << "</properties>\n";
 
-  auto hulls = mm::hull()(unit_map);
+  auto hulls = mm::hull(TILE_SIZE, mm::hull::angle_type::smooth)(unit_map);
 
   for (auto hull : hulls) {
     auto first = hull.front();
-    long x0 = first.x * TILE_SIZE - (TILE_SIZE / 2);
-    long y0 = first.y * TILE_SIZE - (TILE_SIZE / 2);
+    long x0 = first.x - (TILE_SIZE / 2);
+    long y0 = first.y - (TILE_SIZE / 2);
 
     file << "<object name=\"Limit\" type=\"collision\" ";
     file << "x=\"" << x0 << "\" y=\"" << y0 << "\">\n";
     file << "<polygon points=";
     char sep = '"';
     for (auto point : hull) {
-      long x = point.x * TILE_SIZE - (TILE_SIZE / 2);
-      long y = point.y * TILE_SIZE - (TILE_SIZE / 2);
+      long x = point.x - (TILE_SIZE / 2);
+      long y = point.y - (TILE_SIZE / 2);
 
       file << sep << (x - x0) << ',' << (y - y0);
       sep = ' ';
