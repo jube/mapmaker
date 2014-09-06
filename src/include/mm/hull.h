@@ -24,7 +24,27 @@ namespace mm {
 
   class hull {
   public:
+    enum class angle_type {
+      sharp,
+      smooth,
+    };
+
+    hull(unsigned factor = 1, angle_type type = angle_type::sharp)
+    : m_factor(factor)
+    , m_type(type)
+    {
+    }
+
     std::vector<std::vector<position>> operator()(const binarymap& src) const;
+
+  private:
+    position transformed_position(const position& p) const {
+      return { p.x * m_factor, p.y * m_factor };
+    }
+
+  private:
+    unsigned m_factor;
+    angle_type m_type;
   };
 
 }

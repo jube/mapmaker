@@ -48,16 +48,20 @@ namespace {
 
   struct climate {
     range altitude;
-    bool accessible;
+    range humidity;
     bool water;
   };
 
-  static bool climate_match(const climate& c, double  altitude, bool accessible, bool water) {
+  static bool climate_match(const climate& c, double  altitude, double humidity, bool water) {
     if (altitude < c.altitude.min || c.altitude.max < altitude) {
       return false;
     }
 
-    return c.water == water && accessible == c.accessible;
+    if (humidity < c.humidity.min || c.humidity.max < humidity) {
+      return false;
+    }
+
+    return water == c.water;
   }
 
   class biome {
@@ -76,14 +80,14 @@ namespace {
       return m_rep;
     }
 
-    biome& add_climate(range altitude_range, bool accessible, bool water) {
-      m_climates.emplace_back(climate{altitude_range, accessible, water});
+    biome& add_climate(range altitude_range, range humidity_range, bool water) {
+      m_climates.emplace_back(climate{altitude_range, humidity_range, water});
       return *this;
     }
 
-    bool match(double altitude, bool accessible, bool water) const {
+    bool match(double altitude, double humidity, bool water) const {
       for (auto climate : m_climates) {
-        if (climate_match(climate, altitude, accessible, water)) {
+        if (climate_match(climate, altitude, humidity, water)) {
           return true;
         }
       }
@@ -96,11 +100,7 @@ namespace {
         return m_climates.front().water;
       }
 
-      if (m_climates.front().accessible != other.m_climates.front().accessible) {
-        return m_climates.front().accessible;
-      }
-
-      return m_climates.front().altitude.min < other.m_climates.front().altitude.min;
+      return m_climates.front().humidity.min < other.m_climates.front().humidity.min;
     }
 
   private:
@@ -180,42 +180,50 @@ namespace {
       return all_terrains;
     }
 
-    // http://en.wikipedia.org/wiki/Altitudinal_zonation
-    static biomeset altitudinal_zonation() {
+    static biomeset whittaker() {
       biomeset set;
       /*
        * water
        */
-      set.add_terrain({ "Deep Water", {  2,  43,  68}})
-          .add_climate({ 0, 0.12 }, false, true);
-      set.add_terrain({ "Water", {  9,  62,  92}})
-          .add_climate({ 0.12, 0.37 }, false, true);
-      set.add_terrain({ "Shallow Water", { 17,  82, 112}})
-          .add_climate({ 0.37, 1.0 }, false, true)
-          .add_climate({ 0.37, 1.0 }, true, true);
-//       set.add_terrain({ "Shore", { 69, 108, 118}})
-//           .add_climate({ 0.49, 1.0 }, true, true);
-
+      set.add_terrain({ "Water", { 0x33, 0x66, 0x99 }})
+          .add_climate({ 0, 1 }, { 0, 1 }, true);
       /*
        * non-water
        */
-//       set.add_terrain({ "Beach", { 160, 144, 119 }})
-      set.add_terrain({ "Beach", { 255, 255, 136 }})
-          .add_climate({ 0.5, 0.52 }, true, false);
-      set.add_terrain({ "Grass", { 42, 102,  41}})
-          .add_climate({ 0.52, 0.62 }, true, false);
-      set.add_terrain({ "Veld", {115, 128,  77}})
-          .add_climate({ 0.62, 0.8 }, true, false);
-      set.add_terrain({ "Tundra", {153, 143,  92}})
-          .add_climate({ 0.8, 0.9 }, true, false);
-      set.add_terrain({ "Rocks", {126, 126, 126}})
-          .add_climate({ 0.9, 0.95 }, true, false);
-      set.add_terrain({ "Snow", {255, 255, 255}})
-          .add_climate({ 0.95, 1.0 }, true, false);
-
-//       set.add_terrain({ "Inaccessible", {130, 73, 26}})
-      set.add_terrain({ "Inaccessible", {104, 58, 20}})
-          .add_climate({ 0.0, 1.0 }, false, false);
+      set.add_terrain({ "Beach", { 0xA0, 0x90, 0x77 }})
+          .add_climate({ 0.5, 0.52 }, { 0, 1 }, false);
+      // low altitudes
+      set.add_terrain({ "Subtropical Desert", { 0xD2, 0xB9, 0x8B }})
+          .add_climate({ 0.52, 0.65 }, { 0, 0.16 }, false);
+      set.add_terrain({ "Grassland", { 0x88, 0xAA, 0x55 }})
+          .add_climate({ 0.52, 0.65 }, { 0.16, 0.33 }, false)
+          .add_climate({ 0.65, 0.8 }, { 0.16, 0.5 }, false);
+      set.add_terrain({ "Tropical Seasonal Forest", { 0x55, 0x99, 0x44 }})
+          .add_climate({ 0.52, 0.65 }, { 0.33, 0.66 }, false);
+      set.add_terrain({ "Tropical Rain Forest", { 0x33, 0x77, 0x55 }})
+          .add_climate({ 0.52, 0.65 }, { 0.66, 1 }, false);
+      // mid altitudes
+      set.add_terrain({ "Temperate Desert", { 0xC9, 0xD2, 0x9B }})
+          .add_climate({ 0.65, 0.8 }, { 0, 0.16 }, false)
+          .add_climate({ 0.8, 0.9 }, { 0, 0.33 }, false);
+      set.add_terrain({ "Temperate Deciduous Forest", { 0x67, 0x94, 0x59 }})
+          .add_climate({ 0.65, 0.8 }, { 0.5, 0.83 }, false);
+      set.add_terrain({ "Temperate Rain Forest", { 0x44, 0x88, 0x55 }})
+          .add_climate({ 0.65, 0.8 }, { 0.83, 1 }, false);
+      // high altitudes
+      set.add_terrain({ "Shrubland", { 0x88, 0x99, 0x77 }})
+          .add_climate({ 0.8, 0.9 }, { 0.33, 0.66 }, false);
+      set.add_terrain({ "Taiga", { 0x99, 0xAA, 0x77 }})
+          .add_climate({ 0.8, 0.9 }, { 0.66, 1 }, false);
+      // very high altitudes
+      set.add_terrain({ "Scorched", { 0x55, 0x55, 0x55 }})
+          .add_climate({ 0.9, 1 }, { 0, 0.16 }, false);
+      set.add_terrain({ "Bare", { 0x88, 0x88, 0x88 }})
+          .add_climate({ 0.9, 1 }, { 0.16, 0.33 }, false);
+      set.add_terrain({ "Tundra", { 0xBB, 0xBB, 0xAA }})
+          .add_climate({ 0.9, 1 }, { 0.33, 0.5 }, false);
+      set.add_terrain({ "Snow", { 0xFF, 0xFF, 0xFF }})
+          .add_climate({ 0.9, 1 }, { 0.5, 1 }, false);
 
       return set;
     }
@@ -536,8 +544,46 @@ static std::vector<std::vector<mm::position>> generate_rivers(const mm::heightma
 }
 
 /*
- * water
+ * humidity
  */
+
+static mm::heightmap compute_humiditymap(const mm::binarymap& watermap) {
+  mm::heightmap humiditymap(mm::size_only, watermap);
+
+  std::queue<mm::position> queue;
+
+  for(auto x : watermap.x_range()) {
+    for(auto y : watermap.y_range()) {
+      if (watermap(x, y)) {
+        humiditymap(x, y) = 0.9;
+        queue.push({ x, y });
+      }
+    }
+  }
+
+  mm::binarymap computed(watermap);
+
+  while (!queue.empty()) {
+    auto here = queue.front();
+    assert(computed(here));
+
+    double humidity_here = humiditymap(here);
+
+    humiditymap.visit8neighbours(here, [humidity_here, &computed, &queue](mm::position there, double& humidity_there) {
+      if (computed(there)) {
+        return;
+      }
+
+      humidity_there = std::pow(humidity_here, 1.05);
+      computed(there) = true;
+      queue.push(there);
+    });
+
+    queue.pop();
+  }
+
+  return humiditymap;
+}
 
 static mm::binarymap compute_initial_watermap(const mm::heightmap& src, double sea_level) {
   mm::binarymap watermap(mm::size_only, src);
@@ -725,7 +771,7 @@ public:
 };
 
 
-void generate_akagoria_map(YAML::Node node, std::string filename, std::string imgname) {
+void generate_biome_map(YAML::Node node, std::string filename, std::string imgname) {
   /*
    * get parameters
    */
@@ -743,36 +789,36 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 
   auto heightmap_node = node["heightmap"];
   if (!heightmap_node) {
-    throw bad_structure("akagoria-map: missing 'heightmap' in parameters");
+    throw bad_structure("biome-map: missing 'heightmap' in parameters");
   }
 
   auto sea_level_node = node["sea_level"];
   if (!sea_level_node) {
-    throw bad_structure("akagoria-map: missing 'sea_level' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'sea_level' in 'tiled' output parameters");
   }
   auto sea_level = sea_level_node.as<double>();
 
   auto unit_size_node = node["unit_size"];
   if (!unit_size_node) {
-    throw bad_structure("akagoria-map: missing 'unit_size' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'unit_size' in 'tiled' output parameters");
   }
   auto unit_size = unit_size_node.as<mm::reachability::size_type>();
 
   auto unit_talus_node = node["unit_talus"];
   if (!unit_talus_node) {
-    throw bad_structure("akagoria-map: missing 'unit_talus' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'unit_talus' in 'tiled' output parameters");
   }
   auto unit_talus = unit_talus_node.as<double>();
 
   auto rivers_count_node = node["rivers_count"];
   if (!rivers_count_node) {
-    throw bad_structure("akagoria-map: missing 'rivers' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'rivers' in 'tiled' output parameters");
   }
   auto rivers_count = rivers_count_node.as<unsigned>();
 
   auto rivers_min_source_altitude_node = node["rivers_min_source_altitude"];
   if (!rivers_min_source_altitude_node) {
-    throw bad_structure("akagoria-map: missing 'min_source_altitude' in 'tiled' output parameters");
+    throw bad_structure("biome-map: missing 'min_source_altitude' in 'tiled' output parameters");
   }
   auto rivers_min_source_altitude = rivers_min_source_altitude_node.as<double>();
 
@@ -812,33 +858,41 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   }
 
   /*
-   * compute the unit map (accessibility)
+   * compute humidity
    */
-  mm::heightmap::size_type size_max, size_min;
-  std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
-  auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
-
-  mm::binarymap unit_map;
-  std::tie(std::ignore, unit_map, std::ignore) =
-      mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
+  auto humiditymap = compute_humiditymap(watermap);
 
   if (output_intermediates) {
-    unit_map.output_to_pbm("unit_map.pnm");
+    humiditymap.output_to_pgm("humidity.pnm");
   }
 
   /*
    * compute biomes
    */
-  biomeset set = biomeset::altitudinal_zonation();
+  biomeset set = biomeset::whittaker();
+
+  if (output_intermediates) {
+#define BIOMESET_SIZE 256
+    mm::colormap biomes(BIOMESET_SIZE, BIOMESET_SIZE);
+
+    for (auto x : biomes.x_range()) {
+      double humidity = static_cast<double>(x) / BIOMESET_SIZE;
+      for (auto y : biomes.y_range()) {
+        double altitude = static_cast<double>(BIOMESET_SIZE - y) / BIOMESET_SIZE * 0.5 + 0.5;
+
+        int biome = set.compute_biome(altitude, humidity, false);
+        biomes(x, y) = set.biome_representation(biome);
+      }
+    }
+
+    biomes.output_to_ppm("biomeset.pnm");
+  }
+
 
   mm::planemap<int> biomemap(mm::size_only, map);
 
   for (auto fp : map.positions()) {
-    biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), unit_map(fp), watermap(fp));
-
-    if (biomemap(fp) == -1) {
-      std::cerr << "values: " << mm::value_with_sea_level(map(fp), sea_level) << ", " << std::boolalpha << unit_map(fp) << ", " << std::boolalpha << watermap(fp) << '\n';
-    }
+    biomemap(fp) = set.compute_biome(mm::value_with_sea_level(map(fp), sea_level), humiditymap(fp), watermap(fp));
     assert(biomemap(fp) != -1);
   }
 
@@ -882,6 +936,20 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   auto img = compute_tileset_image(tiles, set);
   img.output_to_ppm(imgname);
 
+  /*
+   * compute the unit map
+   */
+  mm::heightmap::size_type size_max, size_min;
+  std::tie(size_min, size_max) = std::minmax(map.width(), map.height());
+  auto size = size_min + (size_max - size_min) / 2; // to avoid overflow
+
+  mm::binarymap unit_map;
+  std::tie(std::ignore, unit_map, std::ignore) =
+      mm::playability(sea_level, unit_size, unit_size, unit_talus / size, unit_talus / size, false)(map);
+
+  if (output_intermediates) {
+    unit_map.output_to_pbm("unit_map.pnm");
+  }
 
   /*
    * compute the tmx file
@@ -949,20 +1017,20 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
   file << "\t<property name=\"kind\" value=\"zone\"/>\n";
   file << "</properties>\n";
 
-  auto hulls = mm::hull(TILE_SIZE, mm::hull::angle_type::smooth)(unit_map);
+  auto hulls = mm::hull()(unit_map);
 
   for (auto hull : hulls) {
     auto first = hull.front();
-    long x0 = first.x - (TILE_SIZE / 2);
-    long y0 = first.y - (TILE_SIZE / 2);
+    long x0 = first.x * TILE_SIZE - (TILE_SIZE / 2);
+    long y0 = first.y * TILE_SIZE - (TILE_SIZE / 2);
 
     file << "<object name=\"Limit\" type=\"collision\" ";
     file << "x=\"" << x0 << "\" y=\"" << y0 << "\">\n";
     file << "<polygon points=";
     char sep = '"';
     for (auto point : hull) {
-      long x = point.x - (TILE_SIZE / 2);
-      long y = point.y - (TILE_SIZE / 2);
+      long x = point.x * TILE_SIZE - (TILE_SIZE / 2);
+      long y = point.y * TILE_SIZE - (TILE_SIZE / 2);
 
       file << sep << (x - x0) << ',' << (y - y0);
       sep = ' ';
@@ -979,7 +1047,7 @@ void generate_akagoria_map(YAML::Node node, std::string filename, std::string im
 }
 
 static void usage() {
-  std::printf("Usage: akagoria-map <file>\n");
+  std::printf("Usage: biome-map <file>\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -990,7 +1058,7 @@ int main(int argc, char *argv[]) {
 
   try {
     YAML::Node node = YAML::LoadFile(argv[1]);
-    generate_akagoria_map(node, "map.tmx", "biomes.pnm");
+    generate_biome_map(node, "map.tmx", "biomes.pnm");
 
   } catch (std::exception& ex) {
     std::printf("Error: %s\n", ex.what());
