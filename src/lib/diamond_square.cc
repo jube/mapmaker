@@ -103,7 +103,7 @@ namespace mm {
     size_type offset_x = (size - width) / 2;
     size_type offset_y = (size - height) / 2;
 
-    return std::move(map.submap(offset_x, offset_y, width, height));
+    return map.submap(offset_x, offset_y, width, height);
   }
 
 }
