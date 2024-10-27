@@ -36,10 +36,17 @@ set(LIBMM_SRC
 
 add_library(mm0 SHARED ${LIBMM_SRC})
 
+target_compile_features(mm0
+  PUBLIC
+    cxx_std_17
+)
+
 set_target_properties(mm0
   PROPERTIES
-  VERSION ${CPACK_PACKAGE_VERSION}
-  SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 install(
